@@ -69,7 +69,7 @@ a:hover{color:var(--blood-lit)}
   display:block;border:1px solid var(--hair-dim);padding:.35rem .8rem .25rem;
   font-family:var(--pixel);font-size:1.3rem;line-height:1;text-decoration:none;color:var(--ash);
 }
-.nav a:hover{border-color:var(--blood);color:var(--blood-lit);background:rgba(179,0,12,.08)}
+.nav a:hover{border-color:var(--bone);color:var(--void);background:var(--bone)}
 
 /* ---- boxes: the whole page is boxes, that IS the layout ---- */
 .box{
@@ -92,21 +92,81 @@ h1,h2{font-family:var(--fraktur);font-weight:400;margin:0}
 h2{font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.05;margin-bottom:1rem}
 h2 .x{color:var(--blood-lit)}
 
-/* thorn corners for the hero frame */
-.thorn{position:absolute;width:74px;height:74px;stroke:var(--bone);fill:none;stroke-width:1.1;opacity:.85;pointer-events:none}
-.thorn.tl{top:-10px;left:-10px}
-.thorn.tr{top:-10px;right:-10px;transform:scaleX(-1)}
-.thorn.bl{bottom:-10px;left:-10px;transform:scaleY(-1)}
-.thorn.br{bottom:-10px;right:-10px;transform:scale(-1)}
+/* claw corners: cropped straight from the traced chrome frame — real thorns, not drawn approximations */
+.claw{
+  position:absolute;width:170px;height:170px;pointer-events:none;background:var(--bone);opacity:.85;
+  -webkit-mask:url('/traced/chrome-frame.svg') 0 0/240% 240% no-repeat;
+  mask:url('/traced/chrome-frame.svg') 0 0/240% 240% no-repeat;
+}
+.claw.tl{top:-16px;left:-16px}
+.claw.tr{top:-16px;right:-16px;-webkit-mask-position:100% 0;mask-position:100% 0}
+.claw.bl{bottom:-16px;left:-16px;-webkit-mask-position:0 100%;mask-position:0 100%}
+.claw.br{bottom:-16px;right:-16px;-webkit-mask-position:100% 100%;mask-position:100% 100%}
+@media(max-width:560px){.claw{width:104px;height:104px}}
+
+/* blood: jagged drip bar hanging from a box's top edge + falling droplets */
+.drips{position:absolute;top:-1px;left:6px;right:6px;height:30px;pointer-events:none;color:var(--blood)}
+.drips svg{display:block;width:100%;height:100%}
+.gota{
+  position:absolute;top:16px;width:3px;height:8px;background:var(--blood-lit);
+  border-radius:0 0 60% 60%/0 0 90% 90%;opacity:0;
+}
+@media(prefers-reduced-motion:no-preference){
+  .gota{animation:gota 3.4s ease-in infinite}
+  .gota:nth-child(2){animation-delay:1.3s}
+  .gota:nth-child(3){animation-delay:2.2s}
+}
+@keyframes gota{
+  0%,52%{transform:translateY(0) scaleY(.4);opacity:0}
+  58%{opacity:1;transform:translateY(4px) scaleY(1)}
+  100%{transform:translateY(58px) scaleY(1.15);opacity:0}
+}
+
+/* mouse trail: tiny falling crosses, the 1999 sparkle trail but ours */
+.trail{
+  position:fixed;z-index:95;width:9px;height:9px;pointer-events:none;translate:-50% -50%;
+  background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9"><path d="M4.5 0v9M0 4.5h9" stroke="%23FF2E39" stroke-width="1.6"/></svg>') center/contain no-repeat;
+  animation:trailfall .7s ease-in forwards;
+}
+@keyframes trailfall{to{transform:translateY(18px) rotate(45deg);opacity:0}}
+
+/* traced relic frames (potrace de las refs de Os): bone lines on transparent */
+.frame-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.9;background:var(--bone)}
+.frame-chrome{
+  -webkit-mask:url('/traced/chrome-frame.svg') center/100% 100% no-repeat;
+  mask:url('/traced/chrome-frame.svg') center/100% 100% no-repeat;
+}
+/* bat ornament: top slice of the traced victorian frame, in flow so it never covers the form */
+.bat-orn{
+  height:clamp(70px,17vw,132px);margin:0 0 1.1rem;background:var(--bone);opacity:.85;pointer-events:none;
+  -webkit-mask:url('/traced/bat-frame.svg') top center/100% auto no-repeat;
+  mask:url('/traced/bat-frame.svg') top center/100% auto no-repeat;
+}
+.hero{padding:clamp(3.4rem,12vw,5.5rem) clamp(2.2rem,9vw,4.5rem) clamp(4.6rem,16vw,6.5rem)}
 
 /* hero */
 .hero{text-align:center;padding-top:2.6rem;padding-bottom:2.4rem}
 .hero .sigil{width:min(56vw,240px);height:auto;display:block;margin:0 auto 1.2rem}
-.hero h1{font-size:clamp(3.4rem,15vw,7rem);line-height:.95}
+.hero h1{
+  font-size:clamp(3.4rem,15vw,7rem);line-height:.95;
+  /* carve the title out of the thorns behind it */
+  text-shadow:0 0 14px var(--void),0 0 28px var(--void),0 0 42px var(--void);
+}
+@media(min-width:720px){.frame-chrome{opacity:.62}}
+@media(prefers-reduced-motion:no-preference){
+  /* candle flicker: rare, sharp, uneven — steps(1), no fade */
+  .hero h1{animation:flicker 8s steps(1) infinite}
+}
+@keyframes flicker{
+  0%,91.9%,93.1%,94.9%,95.6%,100%{opacity:1}
+  92%,92.4%{opacity:.5}
+  95%,95.3%{opacity:.8}
+}
 .hero .sub{font-family:var(--pixel);font-size:clamp(1.2rem,4vw,1.6rem);line-height:1;color:var(--ash);margin:.7rem 0 0}
 .hero .sub b{color:var(--blood-lit);font-weight:400}
 .sigil .thread{fill:none;stroke:var(--hair);stroke-width:1}
-.sigil .spike{fill:none;stroke:var(--blood);stroke-width:1.6;stroke-linecap:round}
+.sigil .fang{fill:var(--blood);stroke:none}
+.sigil .fang.minor{fill:var(--blood-lit);opacity:.7}
 .sigil .glyph{
   font-family:var(--fraktur);font-size:150px;text-anchor:middle;fill:var(--bone);
 }
@@ -128,8 +188,8 @@ th{
   text-align:left;border-bottom:1px solid var(--hair);padding:.5rem .6rem;
 }
 td{border-bottom:1px solid var(--hair-dim);padding:.85rem .6rem;vertical-align:baseline}
-/* pixel, not fraktur: fraktur I/V read as J/B */
-td.no{font-family:var(--pixel);font-size:1.35rem;color:var(--blood-lit);width:3rem}
+/* mono: gothic numerals read wrong in both fraktur (J/B) and pixel */
+td.no{font-family:var(--mono);font-size:.75rem;letter-spacing:.1em;color:var(--blood-lit);width:3rem}
 td.title{font-family:var(--fraktur);font-size:clamp(1.3rem,4vw,1.8rem);line-height:1.1}
 td.meta{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);text-align:right;white-space:nowrap}
 tr:hover td{background:rgba(179,0,12,.07)}
