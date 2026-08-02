@@ -301,7 +301,8 @@ tr:hover td{background:rgba(179,0,12,.07)}
 .member{background:var(--void);padding:1.2rem 1rem;transition:background .3s}
 .member:hover{background:var(--void-2)}
 .member .rune{font-family:var(--pixel);font-size:1.7rem;color:var(--blood-lit);line-height:1}
-.member .who{font-family:var(--fraktur);font-size:1.35rem;margin:.5rem 0 .15rem}
+/* real names never go in fraktur caps — same lesson as the wordmark */
+.member .who{font-family:"Italiana",serif;font-size:1.45rem;letter-spacing:.14em;margin:.5rem 0 .15rem}
 .member .role{font-family:var(--pixel);font-size:1.05rem;line-height:1;color:var(--ash)}
 
 /* guestbook */

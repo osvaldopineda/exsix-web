@@ -3,13 +3,9 @@ import Veil from '../components/Veil.astro';
 import Portal from '../components/Portal.astro';
 import '../styles/global.css';
 const updated = '02.08.2026';
-const seis = [
-  { who: '———', role: 'voz', rot: 0 },
-  { who: '———', role: 'cuerdas', rot: 60 },
-  { who: '———', role: 'batería', rot: 120 },
-  { who: '———', role: 'cámara', rot: 180 },
-  { who: 'SAYAN', role: 'diseño y ropa', rot: 240 },
-  { who: '———', role: 'producción', rot: 300 },
+const colectivo = [
+  { who: 'SAYAN SYN', role: 'diseño · ropa', rot: 0 },
+  { who: 'EXSIX BLOOD', role: 'sonido', rot: 180 },
 ];
 ---
 <!doctype html>
@@ -18,9 +14,9 @@ const seis = [
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EXSIX — sonido · film · ropa</title>
-  <meta name="description" content="EXSIX es un colectivo de seis. Grabamos nuestra música, filmamos nuestros videos y cortamos nuestra propia ropa. Hecho a mano, en la oscuridad." />
+  <meta name="description" content="EXSIX es el colectivo de Sayan Syn y Exsix Blood. Grabamos nuestra música, filmamos nuestros videos y cortamos nuestra propia ropa. Hecho a mano, en la oscuridad." />
   <meta property="og:title" content="EXSIX" />
-  <meta property="og:description" content="Sonido. Film. Ropa. Somos seis, sin dioses ni sellos." />
+  <meta property="og:description" content="Sonido. Film. Ropa. Sin dioses ni sellos." />
   <meta property="og:type" content="website" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -54,8 +50,8 @@ const seis = [
 
     <div class="tick" aria-hidden="true">
       <div>
-        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> somos seis <span>✠</span> sonido film ropa <span>✠</span> firma el libro
-        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> somos seis <span>✠</span> sonido film ropa <span>✠</span> firma el libro
+        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> sayan syn × exsix blood <span>✠</span> sonido film ropa <span>✠</span> firma el libro
+        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> sayan syn × exsix blood <span>✠</span> sonido film ropa <span>✠</span> firma el libro
       </div>
     </div>
 
@@ -65,7 +61,7 @@ const seis = [
         <li><a href="#ritos">ritos</a></li>
         <li><a href="#visiones">visiones</a></li>
         <li><a href="#reliquias">reliquias</a></li>
-        <li><a href="#los-seis">los seis</a></li>
+        <li><a href="#colectivo">el colectivo</a></li>
         <li><a href="#libro">libro de visitas</a></li>
       </ul>
     </nav>
@@ -109,7 +105,7 @@ const seis = [
         <div class="bar">✠ 01 <small>lee esto primero</small></div>
         <p class="dicho">Todo lo hacemos <span class="x">nosotros</span>.</p>
         <p>
-          EXSIX es un colectivo: seis personas y un taller. Grabamos nuestra música,
+          EXSIX somos dos: Sayan Syn y Exsix Blood. Un taller. Grabamos nuestra música,
           filmamos nuestros videos, cortamos nuestra propia ropa. Nadie nos firmó.
           Nadie pidió permiso. Cada cosa en este sitio se hizo a mano, de noche,
           y lleva el nombre de quien la hizo.
@@ -186,13 +182,13 @@ const seis = [
         </div>
       </section>
 
-      <!-- LOS SEIS -->
-      <h2 class="ordo" id="los-seis">( <b>los seis</b> )</h2>
+      <!-- EL COLECTIVO -->
+      <h2 class="ordo" id="colectivo">( <b>el colectivo</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
         <div class="bar">✠ 05 <small>quienes hicieron esto</small></div>
         <div class="six">
-          {seis.map(m => (
+          {colectivo.map(m => (
             <div class="member">
               <svg class="msig" viewBox="0 0 48 48" aria-hidden="true" style={`transform:rotate(${m.rot}deg)`}>
                 <circle cx="24" cy="24" r="21" />
@@ -208,7 +204,7 @@ const seis = [
       </section>
 
       <!-- LIBRO DE VISITAS -->
-      <h2 class="ordo" id="libro">( <b>libro de visitas</b> )</h2>
+      <h2 class="ordo" id="libro">( <b>el libro</b> )</h2>
       <section class="box">
         <div class="bar">✠ 06 <small>deja tu marca</small></div>
         <div class="bat-orn" aria-hidden="true"></div>
@@ -232,7 +228,7 @@ const seis = [
           <li><span class="d">02.08.26</span><span>santuario v4 — el humo se pliega, brasas, sangre que se funde, el portal gira</span></li>
           <li><span class="d">02.08.26</span><span>v3 — picos calcados de las reliquias, español primero</span></li>
           <li><span class="d">02.08.26</span><span>v2 — la niebla respira, libro de visitas abierto</span></li>
-          <li><span class="d">··.··.··</span><span>el colectivo se forma. somos seis. van a oír de nosotros.</span></li>
+          <li><span class="d">··.··.··</span><span>el colectivo se forma: sayan syn y exsix blood. van a oír de nosotros.</span></li>
         </ul>
       </section>
 
