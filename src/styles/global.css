@@ -79,6 +79,7 @@ a:hover{color:var(--blood-lit)}
   margin:0 0 34px;
 }
 .box:focus-within{outline-color:var(--hair)}
+.box>p{max-width:66ch}
 
 /* box header strip, like a window title bar from a dead OS */
 .box .bar{
@@ -89,8 +90,9 @@ a:hover{color:var(--blood-lit)}
 .box .bar small{font-family:var(--mono);font-size:.6rem;letter-spacing:.28em;color:var(--ash);text-transform:uppercase}
 
 h1,h2{font-family:var(--fraktur);font-weight:400;margin:0}
-h2{font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.05;margin-bottom:1rem}
-h2 .x{color:var(--blood-lit)}
+/* the fraktur statements inside boxes — headings live in .ordo now */
+.dicho{font-family:var(--fraktur);font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.05;margin:0 0 1rem}
+.dicho .x{color:var(--blood-lit)}
 
 /* claw corners: cropped straight from the traced chrome frame — real thorns, not drawn approximations */
 .claw{
@@ -98,28 +100,80 @@ h2 .x{color:var(--blood-lit)}
   -webkit-mask:url('/traced/chrome-frame.svg') 0 0/240% 240% no-repeat;
   mask:url('/traced/chrome-frame.svg') 0 0/240% 240% no-repeat;
 }
-.claw.tl{top:-16px;left:-16px}
-.claw.tr{top:-16px;right:-16px;-webkit-mask-position:100% 0;mask-position:100% 0}
-.claw.bl{bottom:-16px;left:-16px;-webkit-mask-position:0 100%;mask-position:0 100%}
-.claw.br{bottom:-16px;right:-16px;-webkit-mask-position:100% 100%;mask-position:100% 100%}
+.claw.tl{top:-6px;left:-6px}
+.claw.tr{top:-6px;right:-6px;-webkit-mask-position:100% 0;mask-position:100% 0}
+.claw.bl{bottom:-6px;left:-6px;-webkit-mask-position:0 100%;mask-position:0 100%}
+.claw.br{bottom:-6px;right:-6px;-webkit-mask-position:100% 100%;mask-position:100% 100%}
 @media(max-width:560px){.claw{width:104px;height:104px}}
 
-/* blood: jagged drip bar hanging from a box's top edge + falling droplets */
-.drips{position:absolute;top:-1px;left:6px;right:6px;height:30px;pointer-events:none;color:var(--blood)}
-.drips svg{display:block;width:100%;height:100%}
-.gota{
-  position:absolute;top:16px;width:3px;height:8px;background:var(--blood-lit);
-  border-radius:0 0 60% 60%/0 0 90% 90%;opacity:0;
+/* floral crops from the victorian frame's bottom corners */
+.flor{
+  position:absolute;width:150px;height:150px;pointer-events:none;background:var(--bone);opacity:.7;
+  -webkit-mask:url('/traced/bat-frame.svg') 0 100%/260% 260% no-repeat;
+  mask:url('/traced/bat-frame.svg') 0 100%/260% 260% no-repeat;
 }
+.flor.bl{bottom:-6px;left:-6px}
+.flor.br{bottom:-6px;right:-6px;-webkit-mask-position:100% 100%;mask-position:100% 100%}
+@media(max-width:560px){.flor{width:96px;height:96px}}
+
+/* ( ordo ): thin needle-serif section markers between boxes — the abyss layer */
+.ordo{
+  font-family:"Italiana",serif;font-weight:400;
+  font-size:clamp(1.45rem,5.6vw,2.3rem);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--bone);display:flex;align-items:center;gap:1.1rem;margin:0 0 1.5rem;
+}
+.ordo::before,.ordo::after{content:"";flex:1;height:1px;background:var(--hair-dim)}
+.ordo b{font-weight:400;color:var(--blood-lit)}
+
+/* ghost wordmark: giant hollow fraktur, cropped like a watermark someone forgot */
+.ghost{
+  font-family:var(--fraktur);font-size:clamp(7rem,36vw,21rem);line-height:.7;height:.62em;
+  overflow:hidden;text-align:center;user-select:none;pointer-events:none;
+  color:transparent;-webkit-text-stroke:1px rgba(232,228,223,.15);
+  margin:.6rem -14px 1.8rem;
+}
+
+/* the lens: a red ring that patrols the page on its own */
+.lens{
+  position:fixed;z-index:60;top:10%;left:62%;width:clamp(88px,24vw,150px);aspect-ratio:1;
+  border:1px solid rgba(255,46,57,.5);border-radius:50%;pointer-events:none;
+}
+.lens::before{
+  content:"";position:absolute;inset:50% auto auto 50%;width:9px;height:9px;translate:-50% -50%;
+  background:
+    linear-gradient(var(--blood-lit),var(--blood-lit)) center/1px 100% no-repeat,
+    linear-gradient(var(--blood-lit),var(--blood-lit)) center/100% 1px no-repeat;
+  opacity:.7;
+}
+@media(prefers-reduced-motion:no-preference){.lens{animation:lensdrift 52s ease-in-out infinite alternate}}
+@media(prefers-reduced-motion:reduce){.lens{display:none}}
+@keyframes lensdrift{
+  0%{transform:translate(0,0) scale(1)}
+  22%{transform:translate(-44vw,24vh) scale(.8)}
+  47%{transform:translate(-14vw,58vh) scale(1.14)}
+  74%{transform:translate(6vw,32vh) scale(.88)}
+  100%{transform:translate(-32vw,4vh) scale(1.02)}
+}
+
+/* wireframe member sigils — same language as the hero ring, one per member */
+.msig{width:46px;height:46px;stroke:var(--ash);fill:none;stroke-width:1;display:block;margin-bottom:.6rem}
+.msig .acc{fill:var(--blood);stroke:none}
+.member:hover .msig{stroke:var(--bone)}
+
+/* blood: gooey drip bar — blur+contrast filter melts drops into the bar as they fall */
+.drips{position:absolute;top:-1px;left:6px;right:6px;height:58px;pointer-events:none}
+.drips svg{display:block;width:100%;height:100%;overflow:visible}
+.drips .gota{opacity:0}
 @media(prefers-reduced-motion:no-preference){
-  .gota{animation:gota 3.4s ease-in infinite}
-  .gota:nth-child(2){animation-delay:1.3s}
-  .gota:nth-child(3){animation-delay:2.2s}
+  .drips .gota{animation:gota 4.2s ease-in infinite}
+  .drips .gota:nth-of-type(2){animation-delay:1.6s;animation-duration:5.1s}
+  .drips .gota:nth-of-type(3){animation-delay:2.9s;animation-duration:3.6s}
 }
 @keyframes gota{
-  0%,52%{transform:translateY(0) scaleY(.4);opacity:0}
-  58%{opacity:1;transform:translateY(4px) scaleY(1)}
-  100%{transform:translateY(58px) scaleY(1.15);opacity:0}
+  0%,42%{transform:translateY(0);opacity:1}
+  58%{transform:translateY(7px);opacity:1}
+  96%{opacity:1}
+  100%{transform:translateY(46px);opacity:0}
 }
 
 /* mouse trail: tiny falling crosses, the 1999 sparkle trail but ours */

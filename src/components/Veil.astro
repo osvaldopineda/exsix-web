@@ -1,10 +1,13 @@
-{/* The Veil — 1-bit dithered blood fog, mouse-reactive. Renders at 1/3 res on purpose: chunky pixels ARE the look. */}
+{/* The Veil v2 — domain-warped 1-bit blood fog + rising embers.
+   Mouse-reactive on desktop, scroll-reactive on touch (90% of visits).
+   Renders at 1/3 res on purpose: chunky pixels ARE the look. */}
 <canvas id="veil" aria-hidden="true"></canvas>
 
 <script>
   const cv = document.getElementById('veil') as HTMLCanvasElement;
   const gl = cv.getContext('webgl', { antialias: false, alpha: false });
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touch = matchMedia('(hover: none)').matches;
 
   if (gl) {
     const FRAG = `
@@ -20,14 +23,22 @@ void main(){
   vec2 uv=gl_FragCoord.xy/u_res;
   vec2 p=uv*vec2(u_res.x/u_res.y,1.);
   float t=u_t*.05;
-  float pull=smoothstep(.55,.0,distance(uv,u_m))*.5;
-  float f=fbm(p*2.4+vec2(t*.6,-t*.35)+(u_m-.5)*.4);
-  f+=fbm(p*6.-t*.25)*.22;
-  float depth=mix(.62,.10,uv.y);           /* fog pools at the floor */
-  float fog=f*(depth+pull);
-  float on=step(bayer4(gl_FragCoord.xy),fog*1.15-.22);
-  float deep=step(bayer4(gl_FragCoord.xy+2.),fog*1.15-.46); /* dense core, brighter */
-  vec3 col=vec3(.42,0.,.03)*on+vec3(.28,.005,.02)*deep;
+  /* domain warp: smoke folding into itself instead of drifting flatly */
+  vec2 q=vec2(fbm(p*1.6+vec2(t*.5,-t*.3)),fbm(p*1.8-vec2(t*.4,t*.6)));
+  float f=fbm(p*2.6+2.2*q+(u_m-.5)*.5);
+  float pull=smoothstep(.55,.0,distance(uv,u_m))*.55;
+  float breathe=.88+.12*sin(u_t*.45);
+  float depth=mix(.72,.12,uv.y);
+  float fog=f*(depth+pull)*breathe;
+  float on=step(bayer4(gl_FragCoord.xy),fog*1.2-.2);
+  float deep=step(bayer4(gl_FragCoord.xy+2.),fog*1.2-.48);
+  vec3 col=vec3(.45,0.,.032)*on+vec3(.3,.004,.02)*deep;
+  /* embers: sparse cells climbing, each flickering out of phase */
+  vec2 ep=vec2(p.x,p.y-u_t*.045)*52.;
+  vec2 cell=floor(ep);
+  float e=step(.9962,h(cell));
+  float spark=e*smoothstep(.42,.0,length(fract(ep)-.5))*(.5+.5*sin(u_t*6.+h(cell)*44.));
+  col+=vec3(1.,.16,.2)*spark*.85;
   gl_FragColor=vec4(col,1.);
 }`;
     const VERT = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
@@ -53,14 +64,22 @@ void main(){
     size(); addEventListener('resize', size);
 
     let mx = 0.5, my = 0.35, tx = 0.5, ty = 0.35;
-    addEventListener('pointermove', e => { tx = e.clientX / innerWidth; ty = 1 - e.clientY / innerHeight; }, { passive: true });
+    if (!touch) {
+      addEventListener('pointermove', e => { tx = e.clientX / innerWidth; ty = 1 - e.clientY / innerHeight; }, { passive: true });
+    }
 
     const frame = (ms: number) => {
+      if (touch) {
+        /* the fog focus descends with you: deeper scroll, lower pull */
+        const max = document.documentElement.scrollHeight - innerHeight;
+        ty = 1 - (max > 0 ? scrollY / max : 0) * 0.85;
+        tx = 0.5 + Math.sin(ms / 9000) * 0.2;
+      }
       mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
       gl.uniform1f(uT, ms / 1000); gl.uniform2f(uM, mx, my);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
-    if (still) { frame(40000); }                 /* one quiet frame, no loop */
+    if (still) { frame(40000); }
     else {
       let raf = 0;
       const loop = (ms: number) => { frame(ms); raf = requestAnimationFrame(loop); };

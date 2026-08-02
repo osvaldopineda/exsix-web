@@ -1,0 +1,83 @@
+{/* Portal — dithered blood vortex in the embed slot. The music gets summoned INTO something. */}
+<div class="portal-slot">
+  <canvas class="portal-cv" aria-hidden="true"></canvas>
+  <span class="portal-label">[ aquí se invocará el embed de spotify / youtube ]</span>
+</div>
+
+<style>
+  .portal-slot{
+    position:relative;margin-top:1.4rem;border:1px dashed var(--hair);
+    height:150px;display:grid;place-items:center;overflow:hidden;
+  }
+  .portal-cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+  .portal-label{
+    position:relative;z-index:1;font-family:var(--pixel);font-size:1.15rem;line-height:1.4;
+    color:var(--bone);text-align:center;padding:.4rem .8rem;background:rgba(5,5,5,.62);
+  }
+</style>
+
+<script>
+  const cv = document.querySelector('.portal-cv') as HTMLCanvasElement;
+  const gl = cv?.getContext('webgl', { antialias: false, alpha: false });
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (gl) {
+    const FRAG = `
+precision mediump float;
+uniform vec2 u_res; uniform float u_t;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+1.),f.x),f.y);}
+float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
+float bayer4(vec2 a){return bayer2(.5*a)*.25+bayer2(a);}
+void main(){
+  vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y;
+  float r=length(uv);
+  float a=atan(uv.y,uv.x);
+  /* three spiral arms twisting inward, edges eaten by noise */
+  float sp=sin(a*3.-u_t*1.1+r*16.+n(uv*5.+u_t*.3)*2.6);
+  float ring=smoothstep(.52,.44,r)*smoothstep(.02,.14,r);
+  float v=(sp*.5+.5)*ring*(1.15-r);
+  float on=step(bayer4(gl_FragCoord.xy),v*1.15-.1);
+  float core=step(bayer4(gl_FragCoord.xy+1.),smoothstep(.16,.0,r)*.9);
+  vec3 col=vec3(.5,.015,.05)*on+vec3(.95,.16,.2)*core*.5;
+  gl_FragColor=vec4(col,1.);
+}`;
+    const VERT = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+    const sh = (t: number, s: string) => {
+      const o = gl.createShader(t)!; gl.shaderSource(o, s); gl.compileShader(o); return o;
+    };
+    const pr = gl.createProgram()!;
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(pr); gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'a');
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const uRes = gl.getUniformLocation(pr, 'u_res'), uT = gl.getUniformLocation(pr, 'u_t');
+
+    const size = () => {
+      const r = cv.getBoundingClientRect();
+      cv.width = Math.max(2, Math.floor(r.width / 3));
+      cv.height = Math.max(2, Math.floor(r.height / 3));
+      gl.viewport(0, 0, cv.width, cv.height);
+      gl.uniform2f(uRes, cv.width, cv.height);
+    };
+    size(); addEventListener('resize', size);
+
+    const frame = (ms: number) => { gl.uniform1f(uT, ms / 1000); gl.drawArrays(gl.TRIANGLES, 0, 3); };
+    if (still) { frame(21000); }
+    else {
+      /* only spins while on screen */
+      let raf = 0, on = false;
+      const loop = (ms: number) => { frame(ms); raf = requestAnimationFrame(loop); };
+      new IntersectionObserver(es => {
+        for (const e of es) {
+          if (e.isIntersecting && !on) { on = true; raf = requestAnimationFrame(loop); }
+          else if (!e.isIntersecting && on) { on = false; cancelAnimationFrame(raf); }
+        }
+      }).observe(cv);
+    }
+  }
+</script>
