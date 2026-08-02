@@ -1,0 +1,13 @@
+{
+  "name": "exsix-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --host --port 4141"
+  },
+  "dependencies": {
+    "astro": "^5.12.0"
+  }
+}

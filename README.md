@@ -1,30 +1,34 @@
-# EXSIX — collective site
+# EXSIX — collective shrine
 
-Sitio del colectivo **EXSIX** (música, film y ropa). Un solo archivo HTML, sin build ni dependencias: solo Google Fonts.
+Sitio del colectivo **EXSIX** (música, film y ropa). Web-revival gótico: la estructura de un sitio personal de 1999 (cajas con borde, update log, guestbook, contador de visitas, badges 88×31, marquee) con una sola pieza de magia moderna: **la Niebla**, un shader WebGL de humo rojo ditherizado a 1-bit que respira detrás de las cajas y sigue el cursor.
+
+## Stack
+
+- **Astro 5** — HTML estático, SEO y velocidad; cero JS de framework en runtime.
+- **WebGL crudo** para el shader (sin three.js: es un solo quad fullscreen, ~90 líneas).
+- Google Fonts: **UnifrakturMaguntia** (display fraktur), **Jacquard 12** (blackletter de píxeles — la tesis "1999 + gótico" en una fuente), **Space Mono** (cuerpo).
 
 ## Correr
 
 ```sh
-python3 -m http.server 4141
+npm install
+npm run dev        # desarrollo
+npm run build      # build a dist/
+npm run preview    # sirve dist/ en :4141 (host visible en LAN)
 ```
-
-Luego abre http://localhost:4141
-
-O simplemente abre `index.html` en el navegador.
 
 ## Dirección visual
 
-Negro absoluto + hueso, con un único acento rojo sangre tomado del logo XG. Blackletter (Grenze Gotisch) para display y sigilos; grotesca (Archivo) para el wordmark y el cuerpo — las capitales blackletter se leen como galimatías, así que "EXSIX" nunca va en gótica. Mono (Space Mono) para metadatos. Grano SVG, hairlines de 1px y un hexagrama fino como sigilo.
+Negro `#050505`, hueso `#E8E4DF`, rojo sangre `#B3000C` (gráfica) / `#FF2E39` (texto, AA sobre negro). Referencias: Drop Dead, BMTH, abysswalker.jp, cyber-sigilism, web revival (Neocities). Reglas aprendidas:
 
-Referencias: Drop Dead (Oliver Sykes), BMTH, https://abysswalker.jp
-
-## Secciones
-
-Portal · I Manifest · II Rites (música) · III Visions (video) · IV Relics (merch) · V The Six · VI Summon
+- El wordmark nunca va en fraktur a secas (las capitales góticas se leen mal); los numerales romanos tampoco (I/V parecen J/B) — esos van en Jacquard 12.
+- El shader renderiza a ⅓ de resolución a propósito (`image-rendering: pixelated`): el píxel gordo es el look.
+- `prefers-reduced-motion`: la niebla congela un frame, marquee y blinks se apagan.
 
 ## Pendiente
 
-- Links reales de Spotify / YouTube (hay un slot marcado en Rites)
-- Fotos reales de merch y stills de video (hoy son placeholders CSS)
-- Nombres y roles reales de los seis
-- Backend del formulario de mailing (hoy solo valida y responde en pantalla)
+- Links reales de Spotify / YouTube (slot en Rites)
+- Fotos reales de merch y stills de video
+- Nombres y roles de los seis
+- Backend del guestbook (hoy vive en localStorage del visitante)
+- Deploy (Cloudflare Pages) cuando Os dé luz verde

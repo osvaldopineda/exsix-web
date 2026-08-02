@@ -1,0 +1,74 @@
+{/* The Veil — 1-bit dithered blood fog, mouse-reactive. Renders at 1/3 res on purpose: chunky pixels ARE the look. */}
+<canvas id="veil" aria-hidden="true"></canvas>
+
+<script>
+  const cv = document.getElementById('veil') as HTMLCanvasElement;
+  const gl = cv.getContext('webgl', { antialias: false, alpha: false });
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (gl) {
+    const FRAG = `
+precision mediump float;
+uniform vec2 u_res; uniform float u_t; uniform vec2 u_m;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+1.),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}
+float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
+float bayer4(vec2 a){return bayer2(.5*a)*.25+bayer2(a);}
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_res;
+  vec2 p=uv*vec2(u_res.x/u_res.y,1.);
+  float t=u_t*.05;
+  float pull=smoothstep(.55,.0,distance(uv,u_m))*.5;
+  float f=fbm(p*2.4+vec2(t*.6,-t*.35)+(u_m-.5)*.4);
+  f+=fbm(p*6.-t*.25)*.22;
+  float depth=mix(.62,.10,uv.y);           /* fog pools at the floor */
+  float fog=f*(depth+pull);
+  float on=step(bayer4(gl_FragCoord.xy),fog*1.15-.22);
+  float deep=step(bayer4(gl_FragCoord.xy+2.),fog*1.15-.46); /* dense core, brighter */
+  vec3 col=vec3(.42,0.,.03)*on+vec3(.28,.005,.02)*deep;
+  gl_FragColor=vec4(col,1.);
+}`;
+    const VERT = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+    const sh = (t: number, s: string) => {
+      const o = gl.createShader(t)!; gl.shaderSource(o, s); gl.compileShader(o); return o;
+    };
+    const pr = gl.createProgram()!;
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(pr); gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'a');
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const uRes = gl.getUniformLocation(pr, 'u_res'), uT = gl.getUniformLocation(pr, 'u_t'), uM = gl.getUniformLocation(pr, 'u_m');
+
+    const size = () => {
+      cv.width = Math.max(2, Math.floor(innerWidth / 3));
+      cv.height = Math.max(2, Math.floor(innerHeight / 3));
+      gl.viewport(0, 0, cv.width, cv.height);
+      gl.uniform2f(uRes, cv.width, cv.height);
+    };
+    size(); addEventListener('resize', size);
+
+    let mx = 0.5, my = 0.35, tx = 0.5, ty = 0.35;
+    addEventListener('pointermove', e => { tx = e.clientX / innerWidth; ty = 1 - e.clientY / innerHeight; }, { passive: true });
+
+    const frame = (ms: number) => {
+      mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
+      gl.uniform1f(uT, ms / 1000); gl.uniform2f(uM, mx, my);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    if (still) { frame(40000); }                 /* one quiet frame, no loop */
+    else {
+      let raf = 0;
+      const loop = (ms: number) => { frame(ms); raf = requestAnimationFrame(loop); };
+      raf = requestAnimationFrame(loop);
+      document.addEventListener('visibilitychange', () => {
+        cancelAnimationFrame(raf);
+        if (!document.hidden) raf = requestAnimationFrame(loop);
+      });
+    }
+  }
+</script>
