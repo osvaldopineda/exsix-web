@@ -1,11 +1,44 @@
 ---
 import Veil from '../components/Veil.astro';
 import Portal from '../components/Portal.astro';
+import Carta from '../components/Carta.astro';
+import { curse, PRECIO } from '../data/curse';
 import '../styles/global.css';
 const updated = '02.08.2026';
 const colectivo = [
   { who: 'SAYAN SYN', role: 'música', rot: 0 },
   { who: 'EXSIX BLOOD', role: 'cámaras · visuales', rot: 180 },
+];
+// Fotogramas reales de CYBERHELL, con el segundo del que salieron.
+const stills = [
+  { src: '/media/film/inventario.webp', alt: 'Interfaz de videojuego con el inventario de ropa EXSIX sobre una rejilla', t: '02:24' },
+  { src: '/media/film/muro.webp',       alt: 'Dos figuras contra un muro verde, una lleva el chaleco naranja EXSIX', t: '02:48' },
+  { src: '/media/film/roto.webp',       alt: 'Rostro rotoscopiado en verde neón sobre fondo morado', t: '04:24' },
+  { src: '/media/film/estudio.webp',    alt: 'Alguien de espaldas frente a un monitor lleno de código, en un cuarto azul', t: '00:24' },
+  { src: '/media/film/banco.webp',      alt: 'Banco de trabajo con un mouse Compaq y un mando de consola', t: '01:12' },
+  { src: '/media/film/calle.webp',      alt: 'Un celular de tapa encendido en la oscuridad con un subtítulo verde', t: '05:00' },
+  { src: '/media/film/tele.webp',       alt: 'Televisión vieja mostrando la criatura CYBERNET y el usuario @x6.exsix.x6', t: '06:00' },
+];
+// Arte del colectivo. El "tipo" sale de cómo ellos mismos nombran cada archivo.
+const obra = [
+  { src: '/media/arte/cybernet.webp',      nombre: 'CYBERNET',      tipo: 'criatura',  alt: 'Cabeza alienígena azul con ojos blancos y baba verde escurriendo' },
+  { src: '/media/arte/aquafina.webp',      nombre: 'AQUAFINA',      tipo: 'portada',   alt: 'Letras infladas de glitter sobre un cielo azul con nubes' },
+  { src: '/media/arte/evixeratox.webp',    nombre: 'EVIXERATOX',    tipo: 'wallpaper', alt: 'Logotipo death metal naranja goteando sobre una rata abierta' },
+  { src: '/media/arte/porker-rojo.webp',   nombre: 'PORKER / rojo', tipo: 'wallpaper', alt: 'Cabeza de cerdo roja dentro de un círculo, humo rojo de fondo' },
+  { src: '/media/arte/porker-verde.webp',  nombre: 'PORKER / verde',tipo: 'wallpaper', alt: 'La misma cabeza de cerdo en verde y azul sobre humo verde' },
+  { src: '/media/arte/curse-n-purse.webp', nombre: 'CURSE N PURSE', tipo: 'colección', alt: 'Espiral morada con una boca de dientes y el texto Curse n Purse' },
+];
+const archivo = [
+  { src: '/media/fotos/xg-chatarra.webp',     alt: 'Figura con pasamontañas XG sentada sobre tarimas en un tiradero de electrónicos' },
+  { src: '/media/fotos/xg-alambrada.webp',    alt: 'La misma figura con guantes de esqueleto y espinas rojas, junto a alambre de púas' },
+  { src: '/media/fotos/mascara-amarilla.webp',alt: 'Perfil con máscara de tela cosida a mano, amarilla y café, y pelo morado' },
+  { src: '/media/fotos/reja-navaja.webp',     alt: 'Persona con chaleco naranja frente a una alambrada de navajas' },
+  { src: '/media/fotos/tee-craneo.webp',      alt: 'Playera morada con un cráneo estampado en naranja, bajo un chaleco naranja' },
+  { src: '/media/fotos/sombra-camo.webp',     alt: 'Figura con chamarra de camuflaje contra un muro amarillo, su sombra hace cuernos' },
+  { src: '/media/fotos/acero-01.webp',        alt: 'Retrato en blanco y negro de alto contraste frente a rejas metálicas' },
+  { src: '/media/fotos/acero-02.webp',        alt: 'Figura con sudadera roja metálica de pie sobre escombros' },
+  { src: '/media/fotos/acero-03.webp',        alt: 'Cuerpo recortado sobre una nave industrial en blanco y negro' },
+  { src: '/media/fotos/sofa-decay.webp',      alt: 'Persona recostada en un sillón abandonado entre basura' },
 ];
 ---
 <!doctype html>
@@ -14,10 +47,12 @@ const colectivo = [
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EXSIX — sonido · film · ropa</title>
-  <meta name="description" content="EXSIX es el colectivo de Sayan Syn y Exsix Blood. Grabamos nuestra música, filmamos nuestros videos y cortamos nuestra propia ropa. Hecho a mano, en la oscuridad." />
+  <meta name="description" content="EXSIX es el colectivo de Sayan Syn y Exsix Blood. Grabamos nuestra música, filmamos nuestros videos y cosemos nuestros propios bolsos. Hecho a mano, en la oscuridad." />
   <meta property="og:title" content="EXSIX" />
   <meta property="og:description" content="Sonido. Film. Ropa. Sin dioses ni sellos." />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://exsix-web.pages.dev/media/arte/xg.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,14 +61,16 @@ const colectivo = [
 <body>
   <a class="skip" href="#manifiesto">Saltar al contenido</a>
 
-  {/* goo filter: melts falling drops into the drip bar */}
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
+      {/* goo filter: melts falling drops into the drip bar */}
       <filter id="goo" x="-20%" y="-20%" width="140%" height="140%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="b" />
         <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="g" />
         <feComposite in="SourceGraphic" in2="g" operator="atop" />
       </filter>
+      {/* pentagrama de las cartas: un trazo, orden 0-2-4-1-3 */}
+      <path id="pent" d="M12 4 L16.7 18.47 L4.39 9.53 L19.61 9.53 L7.3 18.47 Z" />
     </defs>
   </svg>
 
@@ -50,25 +87,28 @@ const colectivo = [
 
     <div class="tick" aria-hidden="true">
       <div>
-        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> sayan syn × exsix blood <span>✠</span> sonido film ropa <span>✠</span> firma el libro
-        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> sayan syn × exsix blood <span>✠</span> sonido film ropa <span>✠</span> firma el libro
+        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> sayan syn × exsix blood <span>✠</span> curse n purse a la venta <span>✠</span> firma el libro
+        <span>✠</span> bienvenido al santuario <span>✠</span> sin dioses ni sellos <span>✠</span> sayan syn × exsix blood <span>✠</span> curse n purse a la venta <span>✠</span> firma el libro
       </div>
     </div>
 
     <nav aria-label="Secciones">
       <ul class="nav">
         <li><a href="#manifiesto">manifiesto</a></li>
-        <li><a href="#ritos">ritos</a></li>
-        <li><a href="#visiones">visiones</a></li>
-        <li><a href="#reliquias">reliquias</a></li>
+        <li><a href="#visiones">el film</a></li>
+        <li><a href="#reliquias">curse n purse</a></li>
+        <li><a href="#obra">obra</a></li>
+        <li><a href="#archivo">archivo</a></li>
+        <li><a href="#ritos">sonido</a></li>
         <li><a href="#colectivo">el colectivo</a></li>
-        <li><a href="#libro">libro de visitas</a></li>
+        <li><a href="#libro">libro</a></li>
       </ul>
     </nav>
 
     <main>
       <!-- PORTAL: enmarcado con los thorns cromados calcados de la ref -->
       <section class="box hero">
+        <div class="hero-plate" aria-hidden="true"></div>
         <div class="frame-art frame-chrome" aria-hidden="true"></div>
         <svg class="sigil" viewBox="0 0 400 400" role="img" aria-label="Sigilo de EXSIX: las letras XG dentro de un anillo de seis puntas">
           <g class="halo">
@@ -106,48 +146,46 @@ const colectivo = [
         <p class="dicho">Todo lo hacemos <span class="x">nosotros</span>.</p>
         <p>
           EXSIX somos dos: Sayan Syn y Exsix Blood. Un taller. Grabamos nuestra música,
-          filmamos nuestros videos, cortamos nuestra propia ropa. Nadie nos firmó.
+          filmamos nuestras películas, cosemos nuestros propios bolsos. Nadie nos firmó.
           Nadie pidió permiso. Cada cosa en este sitio se hizo a mano, de noche,
           y lleva el nombre de quien la hizo.
         </p>
       </section>
 
-      <!-- RITOS -->
-      <h2 class="ordo" id="ritos">( <b>ritos</b> )</h2>
-      <section class="box">
-        <div class="claw bl" aria-hidden="true"></div>
-        <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 02 <small>el disco</small></div>
-        <table>
-          <thead>
-            <tr><th scope="col">nº</th><th scope="col">título</th><th scope="col" style="text-align:right">forma</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="no">I</td><td class="title">Ashfall</td><td class="meta">sencillo · 2026</td></tr>
-            <tr><td class="no">II</td><td class="title">Hollow Choir</td><td class="meta">EP · 2026</td></tr>
-            <tr><td class="no">III</td><td class="title">Teeth of the Garden</td><td class="meta">sencillo · 2025</td></tr>
-            <tr><td class="no">IV</td><td class="title">Untitled Rite</td><td class="meta">inédito</td></tr>
-          </tbody>
-        </table>
-        <Portal />
-      </section>
-
-      <!-- VISIONES -->
-      <h2 class="ordo" id="visiones">( <b>visiones</b> )</h2>
+      <!-- VISIONES: el film real -->
+      <h2 class="ordo" id="visiones">( <b>el film</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 03 <small>el film</small></div>
-        <p class="dicho">Imágenes en <span class="x">movimiento</span>.</p>
+        <div class="bar">✠ 02 <small>cybernet</small></div>
+        <p class="dicho">EXSIX <span class="x">CYBERHELL</span>.</p>
+        <div class="cine">
+          <video
+            id="teaser"
+            poster="/media/film/poster.webp"
+            muted loop playsinline preload="none"
+            aria-label="Fragmento sin sonido de la película CYBERNET — EXSIX CYBERHELL"
+          >
+            <source src="/media/film/teaser.mp4" type="video/mp4" />
+          </video>
+          <button class="cine-play" type="button" aria-controls="teaser">reproducir fragmento</button>
+        </div>
+        <dl class="ficha">
+          <div><dt>duración</dt><dd>6 min 14 s</dd></div>
+          <div><dt>dirección</dt><dd>EXSIX</dd></div>
+          <div><dt>estado</dt><dd>aquí va el fragmento; el corte completo, pronto</dd></div>
+        </dl>
         <div class="plates">
-          <a class="plate" href="#visiones"><span class="field" aria-hidden="true"></span><span class="tag">ashfall — video</span></a>
-          <a class="plate" href="#visiones"><span class="field" aria-hidden="true"></span><span class="tag">estudio, de noche</span></a>
-          <a class="plate" href="#visiones"><span class="field" aria-hidden="true"></span><span class="tag">lookbook</span></a>
-          <a class="plate" href="#visiones"><span class="field" aria-hidden="true"></span><span class="tag">ritual en vivo</span></a>
+          {stills.map(s => (
+            <figure class="plate">
+              <img src={s.src} alt={s.alt} width="1280" height="720" loading="lazy" decoding="async" />
+              <figcaption class="tag">{s.t}</figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 
-      <!-- RELIQUIAS -->
-      <h2 class="ordo" id="reliquias">( <b>reliquias</b> )</h2>
+      <!-- RELIQUIAS: CURSE N PURSE -->
+      <h2 class="ordo" id="reliquias">( <b>curse n purse</b> )</h2>
       <section class="box">
         <div class="drips" aria-hidden="true">
           <svg viewBox="0 0 400 58" preserveAspectRatio="none">
@@ -160,33 +198,61 @@ const colectivo = [
         </div>
         <div class="flor bl" aria-hidden="true"></div>
         <div class="flor br" aria-hidden="true"></div>
-        <div class="bar">✠ 04 <small>la ropa</small></div>
-        <p class="dicho">Se porta, no se <span class="x">compra</span>.</p>
-        <div class="relics">
-          <a class="relic" href="#reliquias">
-            <span class="shot"><span class="glyphmark" aria-hidden="true">XG</span></span>
-            <span class="line"><b>Thorn Hoodie</b><span>$—</span></span>
-          </a>
-          <a class="relic" href="#reliquias">
-            <span class="shot"><span class="glyphmark" aria-hidden="true">VI</span></span>
-            <span class="line"><b>Ashfall Tee</b><span>$—</span></span>
-          </a>
-          <a class="relic" href="#reliquias">
-            <span class="shot"><span class="glyphmark" aria-hidden="true">✠</span></span>
-            <span class="line"><b>Sigil Cap</b><span class="sold">agotado</span></span>
-          </a>
-          <a class="relic" href="#reliquias">
-            <span class="shot"><span class="glyphmark" aria-hidden="true">†</span></span>
-            <span class="line"><b>Drop 01 Jacket</b><span>$—</span></span>
-          </a>
+        <div class="bar">✠ 03 <small>exsix industria</small></div>
+        <p class="dicho">Cada bolso trae su <span class="x">maldición</span>.</p>
+        <p>Bolsos de una sola pieza, cosidos a mano. Cada uno viene con su carta: la entidad que lo habita, lo que exige de ti y lo que pasa si fallas. {PRECIO} cada uno.</p>
+        <p class="pista">Toca una carta para leer la maldición.</p>
+        <div class="cartas">
+          {curse.map(c => <Carta c={c} />)}
         </div>
+        <div class="tira">
+          {[1,2,3,4,5,6].map(n => (
+            <img src={`/media/ropa/bolso-0${n}.webp`} alt={`Bolso de la colección Curse n Purse colgado de cadenas, foto ${n} de 6`} width="1000" height="1000" loading="lazy" decoding="async" />
+          ))}
+        </div>
+      </section>
+
+      <!-- OBRA: el arte -->
+      <h2 class="ordo" id="obra">( <b>obra</b> )</h2>
+      <section class="box">
+        <div class="claw bl" aria-hidden="true"></div>
+        <div class="claw br" aria-hidden="true"></div>
+        <div class="bar">✠ 04 <small>portadas y criaturas</small></div>
+        <div class="obra">
+          {obra.map(o => (
+            <figure>
+              <img src={o.src} alt={o.alt} width="1000" height="1000" loading="lazy" decoding="async" />
+              <figcaption><b>{o.nombre}</b><span>{o.tipo}</span></figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <!-- ARCHIVO: fotografía -->
+      <h2 class="ordo" id="archivo">( <b>archivo</b> )</h2>
+      <section class="box">
+        <div class="bar">✠ 05 <small>lo que quedó en la cámara</small></div>
+        <div class="archivo">
+          {archivo.map(f => (
+            <img src={f.src} alt={f.alt} width="1200" height="900" loading="lazy" decoding="async" />
+          ))}
+        </div>
+      </section>
+
+      <!-- RITOS: el sonido, todavía sin links públicos -->
+      <h2 class="ordo" id="ritos">( <b>sonido</b> )</h2>
+      <section class="box">
+        <div class="claw br" aria-hidden="true"></div>
+        <div class="bar">✠ 06 <small>sayan syn</small></div>
+        <p>La música existe y está grabada. En cuanto tenga casa pública, se invoca aquí.</p>
+        <Portal />
       </section>
 
       <!-- EL COLECTIVO -->
       <h2 class="ordo" id="colectivo">( <b>el colectivo</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 05 <small>quienes hicieron esto</small></div>
+        <div class="bar">✠ 07 <small>quienes hicieron esto</small></div>
         <div class="six">
           {colectivo.map(m => (
             <div class="member">
@@ -206,7 +272,7 @@ const colectivo = [
       <!-- LIBRO DE VISITAS -->
       <h2 class="ordo" id="libro">( <b>el libro</b> )</h2>
       <section class="box">
-        <div class="bar">✠ 06 <small>deja tu marca</small></div>
+        <div class="bar">✠ 08 <small>deja tu marca</small></div>
         <div class="bat-orn" aria-hidden="true"></div>
         <form class="gb-form" id="gb">
           <label class="skip" for="gb-name">Nombre</label>
@@ -223,9 +289,10 @@ const colectivo = [
       <h2 class="ordo" id="bitacora">( <b>bitácora</b> )</h2>
       <section class="box">
         <div class="claw bl" aria-hidden="true"></div>
-        <div class="bar">✠ 07 <small>prueba de vida</small></div>
+        <div class="bar">✠ 09 <small>prueba de vida</small></div>
         <ul class="log">
-          <li><span class="d">02.08.26</span><span>santuario v4 — el humo se pliega, brasas, sangre que se funde, el portal gira</span></li>
+          <li><span class="d">02.08.26</span><span>v5 — entra material real: CYBERHELL, las cartas de curse n purse, el archivo</span></li>
+          <li><span class="d">02.08.26</span><span>v4 — el humo se pliega, brasas, sangre que se funde, el portal gira</span></li>
           <li><span class="d">02.08.26</span><span>v3 — picos calcados de las reliquias, español primero</span></li>
           <li><span class="d">02.08.26</span><span>v2 — la niebla respira, libro de visitas abierto</span></li>
           <li><span class="d">··.··.··</span><span>el colectivo se forma: sayan syn y exsix blood. van a oír de nosotros.</span></li>
@@ -239,7 +306,7 @@ const colectivo = [
         <a class="badge bleed" href="#top">EXSIX ✠ X6</a>
         <a class="badge" href="#manifiesto">SIN DIOSES</a>
         <a class="badge" href="#libro">FIRMA EL LIBRO</a>
-        <a class="badge blink" href="#ritos">SONANDO</a>
+        <a class="badge blink" href="#reliquias">EN VENTA</a>
         <a class="badge" href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">IG ↗</a>
       </div>
     </main>
@@ -282,6 +349,33 @@ const colectivo = [
       form.reset(); render();
     });
     render();
+
+    // cartas de curse n purse: voltear al tocar, con teclado gratis por ser <button>
+    document.querySelectorAll<HTMLButtonElement>('.carta').forEach(b => {
+      b.addEventListener('click', () => {
+        const open = b.getAttribute('aria-expanded') === 'true';
+        b.setAttribute('aria-expanded', String(!open));
+      });
+    });
+
+    // el fragmento no se descarga hasta que alguien lo pide (preload=none)
+    const video = document.getElementById('teaser') as HTMLVideoElement | null;
+    const play = document.querySelector<HTMLButtonElement>('.cine-play');
+    if (video && play) {
+      play.addEventListener('click', () => {
+        if (video.paused) { video.play(); play.textContent = 'pausar'; }
+        else { video.pause(); play.textContent = 'reproducir fragmento'; }
+      });
+      // en pantalla y sin reduced-motion: arranca solo, mudo
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        new IntersectionObserver((es, o) => {
+          if (es[0].isIntersecting) {
+            video.play().then(() => { play.textContent = 'pausar'; }).catch(() => {});
+            o.disconnect();
+          }
+        }, { threshold: 0.4 }).observe(video);
+      }
+    }
 
     // estela del cursor — cruces que caen, como los trails de 1999
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover:hover)').matches) {

@@ -1,0 +1,27 @@
+---
+// Carta de CURSE N PURSE — reconstruida en HTML a partir de las que EXSIX
+// publica en IG: barra del nombre, ocho pentagramas, foto, dorso con la maldición.
+import type { Carta } from '../data/curse';
+import { PRECIO } from '../data/curse';
+const { c } = Astro.props as { c: Carta };
+---
+<button class="carta" type="button" aria-expanded="false" aria-label={`Carta ${c.nombre}. Activa para leer la maldición.`}>
+  <span class="carta-in">
+    <span class="cara frente">
+      <span class="nombre">{c.nombre}</span>
+      <span class="pips" aria-hidden="true">
+        {Array.from({ length: c.pips }).map(() => (
+          <svg viewBox="0 0 24 24"><use href="#pent" /></svg>
+        ))}
+      </span>
+      <img src={c.img} alt={`Bolso ${c.nombre} de la colección Curse n Purse`} width="498" height="308" loading="lazy" decoding="async" />
+      <span class="pie">EXSIX INDUSTRIA</span>
+    </span>
+    <span class="cara dorso">
+      <span class="tipo">{c.tipo}</span>
+      <span class="lore">{c.texto}</span>
+      <span class="stats">{c.stats[0]}<b>{c.stats[1]}</b></span>
+      <span class="pie">EXSIX INDUSTRIA <em>{PRECIO}</em></span>
+    </span>
+  </span>
+</button>

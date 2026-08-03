@@ -8,6 +8,8 @@
   --blood-lit:#FF2E39;
   --hair:rgba(232,228,223,.26);
   --hair-dim:rgba(232,228,223,.12);
+  /* morado de las cartas de EXSIX INDUSTRIA — vive SOLO dentro de .carta */
+  --curse:#6E4F9E;
   --fraktur:"UnifrakturMaguntia",serif;
   --pixel:"Jacquard 12",monospace;
   --mono:"Space Mono",ui-monospace,monospace;
@@ -199,7 +201,16 @@ h1,h2{font-family:var(--fraktur);font-weight:400;margin:0}
 .hero{padding:clamp(3.4rem,12vw,5.5rem) clamp(2.2rem,9vw,4.5rem) clamp(4.6rem,16vw,6.5rem)}
 
 /* hero */
-.hero{text-align:center;padding-top:2.6rem;padding-bottom:2.4rem}
+.hero{text-align:center;padding-top:2.6rem;padding-bottom:2.4rem;overflow:hidden}
+/* foto real de ellos detrás del sigilo, quemada a duotono para que no compita */
+.hero-plate{
+  position:absolute;inset:0;pointer-events:none;
+  background:url('/media/fotos/xg-chatarra.webp') center 22%/cover no-repeat;
+  filter:grayscale(1) contrast(1.5) brightness(.5);
+  mask:radial-gradient(72% 60% at 50% 42%,#000 20%,transparent 78%);
+  -webkit-mask:radial-gradient(72% 60% at 50% 42%,#000 20%,transparent 78%);
+  opacity:.5;mix-blend-mode:luminosity;
+}
 .hero .sigil{width:min(56vw,240px);height:auto;display:block;margin:0 auto 1.2rem}
 .hero h1{
   font-size:clamp(3.4rem,15vw,7rem);line-height:.95;
@@ -235,66 +246,115 @@ h1,h2{font-family:var(--fraktur);font-weight:400;margin:0}
 @keyframes ink{to{fill:var(--bone)}}
 @keyframes turn{to{transform:rotate(360deg)}}
 
-/* rites table — a real table, set like 1999 */
-table{width:100%;border-collapse:collapse;font-size:.8rem}
-th{
-  font-family:var(--pixel);font-size:1.15rem;font-weight:400;line-height:1;color:var(--ash);
-  text-align:left;border-bottom:1px solid var(--hair);padding:.5rem .6rem;
+/* ---- el film: fragmento + ficha + fotogramas ---- */
+.cine{position:relative;border:1px solid var(--hair);background:var(--void-2);aspect-ratio:16/9;overflow:hidden}
+.cine video{width:100%;height:100%;display:block;object-fit:cover;filter:contrast(1.06) saturate(1.1)}
+.cine-play{
+  position:absolute;left:10px;bottom:10px;z-index:1;
+  background:rgba(5,5,5,.78);border:1px solid var(--hair);color:var(--bone);
+  font-family:var(--pixel);font-size:1.1rem;line-height:1;padding:.45rem .8rem .35rem;
 }
-td{border-bottom:1px solid var(--hair-dim);padding:.85rem .6rem;vertical-align:baseline}
-/* mono: gothic numerals read wrong in both fraktur (J/B) and pixel */
-td.no{font-family:var(--mono);font-size:.75rem;letter-spacing:.1em;color:var(--blood-lit);width:3rem}
-td.title{font-family:var(--fraktur);font-size:clamp(1.3rem,4vw,1.8rem);line-height:1.1}
-td.meta{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);text-align:right;white-space:nowrap}
-tr:hover td{background:rgba(179,0,12,.07)}
-.slot{
-  margin-top:1.4rem;border:1px dashed var(--hair);padding:1.4rem;text-align:center;
-  font-family:var(--pixel);font-size:1.15rem;line-height:1.4;color:var(--ash);
-}
+.cine-play:hover{background:var(--blood);border-color:var(--blood)}
 
-/* visions — dithered plates */
-.plates{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.plate{
-  position:relative;aspect-ratio:4/3;border:1px solid var(--hair);overflow:hidden;
-  display:grid;place-items:center;text-decoration:none;background:var(--void-2);
+.ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;margin:14px 0 20px;
+  background:var(--hair-dim);border:1px solid var(--hair-dim)}
+.ficha>div{background:var(--void);padding:.8rem 1rem}
+.ficha dt{font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ash)}
+.ficha dd{margin:.25rem 0 0;font-family:var(--pixel);font-size:1.15rem;line-height:1.3;color:var(--bone)}
+
+/* fotogramas: monocromo hasta que los miras */
+.plates{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.plate{position:relative;margin:0;border:1px solid var(--hair);overflow:hidden;background:var(--void-2)}
+.plate img{
+  display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:cover;
+  filter:grayscale(1) contrast(1.2);transition:filter .45s;
 }
-.plate .field{
-  position:absolute;inset:0;
-  background:
-    repeating-linear-gradient(0deg,rgba(232,228,223,.06) 0 1px,transparent 1px 3px),
-    repeating-linear-gradient(90deg,rgba(232,228,223,.04) 0 1px,transparent 1px 3px),
-    radial-gradient(130% 110% at 30% 15%,rgba(179,0,12,.45),transparent 55%),
-    linear-gradient(150deg,#161212,#050505);
-  filter:grayscale(1) contrast(1.25);
-  transition:filter .45s;
-}
-.plate:hover .field,.plate:focus-visible .field{filter:grayscale(0) contrast(1.4)}
-@media(hover:none){.plate .field{filter:grayscale(.35) contrast(1.25)}}
+.plate:hover img{filter:grayscale(0) contrast(1.15)}
+@media(hover:none){.plate img{filter:grayscale(.3) contrast(1.15)}}
 .plate .tag{
-  position:relative;z-index:1;font-family:var(--pixel);font-size:1.1rem;line-height:1;
-  color:var(--bone);border:1px solid var(--hair);background:rgba(5,5,5,.72);padding:.45rem .7rem .35rem;
+  position:absolute;right:6px;bottom:6px;font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;
+  color:var(--bone);border:1px solid var(--hair);background:rgba(5,5,5,.78);padding:.2rem .4rem;
 }
 
-/* relics */
-.relics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
-.relic{text-decoration:none}
-.relic .shot{
-  aspect-ratio:4/5;border:1px solid var(--hair);display:grid;place-items:center;
-  background:linear-gradient(165deg,#121010,#050505);transition:border-color .3s;position:relative;overflow:hidden;
+/* ---- cartas de curse n purse ---- */
+.pista{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);margin:0 0 1rem}
+.cartas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-bottom:20px}
+.carta{
+  all:unset;display:block;perspective:1100px;aspect-ratio:719/901;
+  cursor:inherit;-webkit-tap-highlight-color:transparent;
 }
-.relic .shot::after{
-  content:"";position:absolute;inset:0;opacity:0;transition:opacity .35s;
-  background:radial-gradient(85% 55% at 50% 115%,rgba(179,0,12,.5),transparent 60%);
+.carta:focus-visible{outline:2px solid var(--blood-lit);outline-offset:4px}
+.carta-in{
+  position:relative;display:block;width:100%;height:100%;
+  transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1);
 }
-.relic:hover .shot{border-color:var(--blood)}
-.relic:hover .shot::after,.relic:focus-visible .shot::after{opacity:1}
-.relic .glyphmark{font-family:var(--fraktur);font-size:2.8rem;color:rgba(232,228,223,.16);position:relative;z-index:1}
-.relic .line{
-  display:flex;justify-content:space-between;gap:.6rem;margin-top:.5rem;
-  font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);
+.carta[aria-expanded="true"] .carta-in{transform:rotateY(180deg)}
+@media(hover:hover){.carta:hover .carta-in{transform:rotateY(180deg)}
+  .carta[aria-expanded="true"]:hover .carta-in{transform:rotateY(0)}}
+.cara{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:grid;grid-template-rows:auto auto 1fr auto;gap:8px;
+  padding:10px;border:1px solid var(--curse);
+  background:linear-gradient(170deg,#241a33,#0b0810 62%);
 }
-.relic .line b{color:var(--bone);font-weight:400}
-.sold{color:var(--blood-lit)}
+.cara.dorso{transform:rotateY(180deg);grid-template-rows:auto 1fr auto auto}
+.carta .nombre{
+  font-family:"Italiana",serif;font-size:clamp(1.1rem,4.4vw,1.5rem);letter-spacing:.16em;
+  text-align:center;color:var(--bone);background:var(--void);border:1px solid var(--curse);
+  padding:.35rem .3rem .25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.carta .pips{display:flex;justify-content:center;gap:3px}
+.carta .pips svg{width:14px;height:14px;fill:none;stroke:rgba(255,255,255,.75);stroke-width:1.4;
+  background:var(--blood);border-radius:50%;padding:1px}
+.carta img{width:100%;height:100%;object-fit:cover;display:block;border-radius:14px;border:1px solid var(--void)}
+.carta .pie{
+  font-family:var(--mono);font-size:.5rem;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ash);text-align:center;display:flex;justify-content:center;gap:.6rem;
+}
+.carta .pie em{font-style:normal;color:var(--blood-lit)}
+/* dorso: el estallido rojo + la caja blanca de la maldición */
+.carta .tipo{
+  font-family:"Italiana",serif;font-size:clamp(1rem,4vw,1.35rem);letter-spacing:.14em;color:var(--bone);
+  text-align:center;padding:.3rem;background:radial-gradient(70% 130% at 50% 50%,var(--blood),transparent 72%);
+}
+.carta .lore{
+  font-family:var(--mono);font-size:clamp(.5rem,2.1vw,.62rem);line-height:1.5;text-align:left;
+  color:var(--void);background:var(--bone);padding:.6rem .7rem;overflow:auto;
+}
+.carta .stats{
+  display:flex;justify-content:flex-end;gap:.8rem;background:var(--bone);color:var(--void);
+  font-family:var(--mono);font-weight:700;font-size:clamp(.58rem,2.3vw,.72rem);padding:.15rem .7rem .5rem;
+  margin-top:-8px;
+}
+.carta .stats b{font-weight:700}
+
+/* tira de fotos sueltas de los bolsos */
+.tira{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
+.tira img{width:100%;aspect-ratio:1;object-fit:cover;display:block;border:1px solid var(--hair-dim)}
+.tira img:hover{border-color:var(--blood)}
+
+/* ---- obra: portadas y criaturas ---- */
+.obra{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.obra figure{margin:0}
+.obra img{
+  width:100%;aspect-ratio:1;object-fit:cover;display:block;
+  border:1px solid var(--hair);background:var(--void-2);transition:border-color .3s,transform .5s;
+}
+.obra figure:hover img{border-color:var(--blood);transform:scale(1.02)}
+.obra figcaption{
+  display:flex;justify-content:space-between;gap:.6rem;margin-top:.45rem;
+  font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);
+}
+.obra figcaption b{color:var(--bone);font-weight:400}
+
+/* ---- archivo: mosaico de fotos ---- */
+.archivo{columns:3 150px;column-gap:8px}
+.archivo img{
+  width:100%;display:block;margin-bottom:8px;break-inside:avoid;
+  border:1px solid var(--hair-dim);filter:grayscale(.55) contrast(1.1);transition:filter .5s;
+}
+.archivo img:hover{filter:grayscale(0) contrast(1.05)}
+@media(hover:none){.archivo img{filter:grayscale(.25)}}
 
 /* the six */
 .six{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--hair-dim);border:1px solid var(--hair-dim)}
@@ -362,4 +422,6 @@ button:hover{background:var(--blood);border-color:var(--blood)}
   html{scroll-behavior:auto}
   .tick div{animation:none}
   .badge.blink{animation:none}
+  .carta-in{transition:none}
+  .obra figure:hover img{transform:none}
 }
