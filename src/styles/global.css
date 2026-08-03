@@ -337,6 +337,33 @@ h1,h2{font-family:var(--fraktur);font-weight:400;margin:0}
 .tira img{width:100%;aspect-ratio:1;object-fit:cover;display:block;border:1px solid var(--hair-dim)}
 .tira img:hover{border-color:var(--blood)}
 
+/* ---- ritos: fachadas de los videos ---- */
+.ritos{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;list-style:none;margin:0;padding:0;counter-reset:rito}
+.rito{counter-increment:rito}
+.rito-go{
+  all:unset;position:relative;display:block;width:100%;aspect-ratio:16/9;overflow:hidden;
+  border:1px solid var(--hair);background:var(--void-2);cursor:inherit;
+}
+.rito-go:focus-visible{outline:2px solid var(--blood-lit);outline-offset:3px}
+.rito-go img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) contrast(1.15);transition:filter .4s}
+.rito-go:hover img,.rito-go:focus-visible img{filter:grayscale(0) contrast(1.05)}
+@media(hover:none){.rito-go img{filter:grayscale(.3) contrast(1.1)}}
+/* triángulo de play dibujado con bordes, sin glifo que dependa de la fuente */
+.rito-play{
+  position:absolute;inset:50% auto auto 50%;translate:-50% -50%;
+  width:0;height:0;border-style:solid;border-width:13px 0 13px 22px;
+  border-color:transparent transparent transparent var(--bone);
+  filter:drop-shadow(0 0 10px var(--void));transition:border-left-color .3s,scale .3s;
+}
+.rito-go:hover .rito-play{border-left-color:var(--blood-lit);scale:1.15}
+.rito iframe{width:100%;aspect-ratio:16/9;border:1px solid var(--blood);display:block;background:var(--void)}
+.rito-meta{
+  display:flex;justify-content:space-between;gap:.6rem;margin:.45rem 0 0;
+  font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ash);
+}
+.rito-meta b{color:var(--bone);font-weight:400}
+.rito-meta b::before{content:counter(rito,upper-roman) " · ";color:var(--blood-lit)}
+
 /* ---- obra: portadas y criaturas ---- */
 .obra{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
 .obra figure{margin:0}

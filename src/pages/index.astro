@@ -1,8 +1,8 @@
 ---
 import Veil from '../components/Veil.astro';
-import Portal from '../components/Portal.astro';
 import Carta from '../components/Carta.astro';
 import { curse, PRECIO } from '../data/curse';
+import { ritos } from '../data/rites';
 import '../styles/global.css';
 const updated = '02.08.2026';
 const colectivo = [
@@ -172,7 +172,7 @@ const archivo = [
         <dl class="ficha">
           <div><dt>duración</dt><dd>6 min 14 s</dd></div>
           <div><dt>dirección</dt><dd>EXSIX</dd></div>
-          <div><dt>estado</dt><dd>aquí va el fragmento; el corte completo, pronto</dd></div>
+          <div><dt>completa</dt><dd><a href="https://youtu.be/hGitY6U2s48" target="_blank" rel="noopener">CYBERNET en YouTube ↗</a></dd></div>
         </dl>
         <div class="plates">
           {stills.map(s => (
@@ -239,13 +239,24 @@ const archivo = [
         </div>
       </section>
 
-      <!-- RITOS: el sonido, todavía sin links públicos -->
+      <!-- RITOS: los videos del canal -->
       <h2 class="ordo" id="ritos">( <b>sonido</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 06 <small>sayan syn</small></div>
-        <p>La música existe y está grabada. En cuanto tenga casa pública, se invoca aquí.</p>
-        <Portal />
+        <div class="bar">✠ 06 <small>seis ritos</small></div>
+        <p class="dicho">Súbele al <span class="x">volumen</span>.</p>
+        <p class="pista">Nada de YouTube se carga hasta que aprietas play.</p>
+        <ol class="ritos">
+          {ritos.map(r => (
+            <li class="rito">
+              <button class="rito-go" type="button" data-yt={r.id} aria-label={`Reproducir ${r.titulo}, de ${r.autor}`}>
+                <img src={r.thumb} alt="" width="900" height="506" loading="lazy" decoding="async" />
+                <span class="rito-play" aria-hidden="true"></span>
+              </button>
+              <p class="rito-meta"><b>{r.titulo}</b><span>{r.autor}</span></p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <!-- EL COLECTIVO -->
@@ -308,6 +319,7 @@ const archivo = [
         <a class="badge" href="#libro">FIRMA EL LIBRO</a>
         <a class="badge blink" href="#reliquias">EN VENTA</a>
         <a class="badge" href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">IG ↗</a>
+        <a class="badge" href="https://www.youtube.com/@EXSIX" target="_blank" rel="noopener">YT ↗</a>
       </div>
     </main>
 
@@ -355,6 +367,22 @@ const archivo = [
       b.addEventListener('click', () => {
         const open = b.getAttribute('aria-expanded') === 'true';
         b.setAttribute('aria-expanded', String(!open));
+      });
+    });
+
+    // ritos: la miniatura es nuestra; el iframe de YouTube solo entra al apretar play
+    document.querySelectorAll<HTMLButtonElement>('.rito-go').forEach(b => {
+      b.addEventListener('click', () => {
+        const id = b.dataset.yt;
+        if (!id) return;
+        const f = document.createElement('iframe');
+        f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+        f.title = b.getAttribute('aria-label') || 'Video de EXSIX';
+        f.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture; web-share';
+        f.allowFullscreen = true;
+        f.loading = 'lazy';
+        b.replaceWith(f);
+        f.focus();
       });
     });
 
