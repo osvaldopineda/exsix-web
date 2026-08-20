@@ -4,7 +4,7 @@ import Carta from '../components/Carta.astro';
 import { curse, PRECIO } from '../data/curse';
 import { ritos } from '../data/rites';
 import '../styles/global.css';
-const updated = '02.08.2026';
+const updated = '19.08.2026';
 const colectivo = [
   { who: 'SAYAN SYN', role: 'música', rot: 0 },
   { who: 'EXSIX BLOOD', role: 'cámaras · visuales', rot: 180 },
@@ -59,7 +59,7 @@ const archivo = [
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Jacquard+12&family=Italiana&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <a class="skip" href="#manifiesto">Saltar al contenido</a>
+  <a class="skip" href="#curse">Saltar al contenido</a>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
@@ -92,15 +92,16 @@ const archivo = [
       </div>
     </div>
 
-    <nav aria-label="Secciones">
+    <nav aria-label="Realm — índice del sitio">
+      <p class="realm" aria-hidden="true">✠ realm ✠</p>
       <ul class="nav">
-        <li><a href="#manifiesto">manifiesto</a></li>
-        <li><a href="#visiones">el film</a></li>
-        <li><a href="#reliquias">curse n purse</a></li>
-        <li><a href="#obra">obra</a></li>
-        <li><a href="#archivo">archivo</a></li>
-        <li><a href="#ritos">sonido</a></li>
-        <li><a href="#colectivo">el colectivo</a></li>
+        <li><a href="#curse">curse</a></li>
+        <li><a href="#manifestations">manifestations</a></li>
+        <li><a href="#clothes">clothes</a></li>
+        <li><a href="#reveletions">reveletions</a></li>
+        <li><a href="#darkroom">dark room</a></li>
+        <li><a href="#crypt">crypt</a></li>
+        <li><a href="#industries">industries</a></li>
         <li><a href="#libro">libro</a></li>
       </ul>
     </nav>
@@ -125,12 +126,13 @@ const archivo = [
           </g>
           <text class="glyph" x="200" y="252">XG</text>
         </svg>
-        <h1>EXSIX</h1>
+        <h1><img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" /></h1>
+        <p class="demons">exsix demons</p>
         <p class="sub">sonido <b>✠</b> film <b>✠</b> ropa</p>
       </section>
 
-      <!-- MANIFIESTO -->
-      <h2 class="ordo" id="manifiesto">( <b>manifiesto</b> )</h2>
+      <!-- CURSE: el manifiesto real, en pergamino -->
+      <h2 class="ordo" id="curse">( <b>curse</b> )</h2>
       <section class="box">
         <div class="drips" aria-hidden="true">
           <svg viewBox="0 0 400 58" preserveAspectRatio="none">
@@ -142,8 +144,18 @@ const archivo = [
           </svg>
         </div>
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 01 <small>lee esto primero</small></div>
+        <div class="bar">✠ 01 <small>el pergamino</small></div>
         <p class="dicho">Todo lo hacemos <span class="x">nosotros</span>.</p>
+        <div class="scroll">
+          <p>
+            EXSIX representa un universo oscuro y postapocalíptico donde lo humano y lo
+            demoníaco coexisten entre la decadencia y las ruinas. Sus criaturas son
+            sobrevivientes de un mundo destruido, símbolos de transformación,
+            melancolía y caos. Un lugar entre el cielo y el infierno donde la belleza
+            existe dentro de la destrucción.
+          </p>
+          <p class="sello" aria-hidden="true">✠</p>
+        </div>
         <p>
           EXSIX somos dos: Sayan Syn y Exsix Blood. Un taller. Grabamos nuestra música,
           filmamos nuestras películas, cosemos nuestros propios bolsos. Nadie nos firmó.
@@ -152,11 +164,11 @@ const archivo = [
         </p>
       </section>
 
-      <!-- VISIONES: el film real -->
-      <h2 class="ordo" id="visiones">( <b>el film</b> )</h2>
+      <!-- MANIFESTATIONS: la novedad de videos -->
+      <h2 class="ordo" id="manifestations">( <b>manifestations</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 02 <small>cybernet</small></div>
+        <div class="bar">✠ 02 <small>la novedad — cybernet</small></div>
         <p class="dicho">EXSIX <span class="x">CYBERHELL</span>.</p>
         <div class="cine">
           <video
@@ -184,8 +196,8 @@ const archivo = [
         </div>
       </section>
 
-      <!-- RELIQUIAS: CURSE N PURSE -->
-      <h2 class="ordo" id="reliquias">( <b>curse n purse</b> )</h2>
+      <!-- EXSIX CLOTHES: ropa y accesorios -->
+      <h2 class="ordo" id="clothes">( <b>exsix clothes</b> )</h2>
       <section class="box">
         <div class="drips" aria-hidden="true">
           <svg viewBox="0 0 400 58" preserveAspectRatio="none">
@@ -198,7 +210,7 @@ const archivo = [
         </div>
         <div class="flor bl" aria-hidden="true"></div>
         <div class="flor br" aria-hidden="true"></div>
-        <div class="bar">✠ 03 <small>exsix industria</small></div>
+        <div class="bar">✠ 03 <small>curse n purse</small></div>
         <p class="dicho">Cada bolso trae su <span class="x">maldición</span>.</p>
         <p>Bolsos de una sola pieza, cosidos a mano. Cada uno viene con su carta: la entidad que lo habita, lo que exige de ti y lo que pasa si fallas. {PRECIO} cada uno.</p>
         <p class="pista">Toca una carta para leer la maldición.</p>
@@ -212,8 +224,8 @@ const archivo = [
         </div>
       </section>
 
-      <!-- OBRA: el arte -->
-      <h2 class="ordo" id="obra">( <b>obra</b> )</h2>
+      <!-- REVELETIONS: el arte (así lo escriben ellos) -->
+      <h2 class="ordo" id="reveletions">( <b>reveletions</b> )</h2>
       <section class="box">
         <div class="claw bl" aria-hidden="true"></div>
         <div class="claw br" aria-hidden="true"></div>
@@ -228,8 +240,8 @@ const archivo = [
         </div>
       </section>
 
-      <!-- ARCHIVO: fotografía -->
-      <h2 class="ordo" id="archivo">( <b>archivo</b> )</h2>
+      <!-- DARK ROOM: archivo de fotos -->
+      <h2 class="ordo" id="darkroom">( <b>dark room</b> )</h2>
       <section class="box">
         <div class="bar">✠ 05 <small>lo que quedó en la cámara</small></div>
         <div class="archivo">
@@ -239,11 +251,11 @@ const archivo = [
         </div>
       </section>
 
-      <!-- RITOS: los videos del canal -->
-      <h2 class="ordo" id="ritos">( <b>sonido</b> )</h2>
+      <!-- CRYPT: los videos del canal -->
+      <h2 class="ordo" id="crypt">( <b>crypt</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 06 <small>seis ritos</small></div>
+        <div class="bar">✠ 06 <small>seis ritos del canal</small></div>
         <p class="dicho">Súbele al <span class="x">volumen</span>.</p>
         <p class="pista">Nada de YouTube se carga hasta que aprietas play.</p>
         <ol class="ritos">
@@ -259,11 +271,24 @@ const archivo = [
         </ol>
       </section>
 
+      <!-- EXSIX INDUSTRIES: ropa personalizada por encargo -->
+      <h2 class="ordo" id="industries">( <b>exsix industries</b> )</h2>
+      <section class="box">
+        <div class="claw br" aria-hidden="true"></div>
+        <div class="bar">✠ 07 <small>ropa personalizada</small></div>
+        <p class="dicho">Pide tu propia <span class="x">maldición</span>.</p>
+        <p>
+          Ropa y bolsos por encargo, cosidos a mano pieza por pieza. Cuéntanos qué
+          traes en la cabeza y lo convertimos en algo que puedas vestir.
+        </p>
+        <p><a class="badge bleed" href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">escríbenos por instagram ↗</a></p>
+      </section>
+
       <!-- EL COLECTIVO -->
       <h2 class="ordo" id="colectivo">( <b>el colectivo</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">✠ 07 <small>quienes hicieron esto</small></div>
+        <div class="bar">✠ 08 <small>quienes hicieron esto</small></div>
         <div class="six">
           {colectivo.map(m => (
             <div class="member">
@@ -283,7 +308,7 @@ const archivo = [
       <!-- LIBRO DE VISITAS -->
       <h2 class="ordo" id="libro">( <b>el libro</b> )</h2>
       <section class="box">
-        <div class="bar">✠ 08 <small>deja tu marca</small></div>
+        <div class="bar">✠ 09 <small>deja tu marca</small></div>
         <div class="bat-orn" aria-hidden="true"></div>
         <form class="gb-form" id="gb">
           <label class="skip" for="gb-name">Nombre</label>
@@ -300,8 +325,9 @@ const archivo = [
       <h2 class="ordo" id="bitacora">( <b>bitácora</b> )</h2>
       <section class="box">
         <div class="claw bl" aria-hidden="true"></div>
-        <div class="bar">✠ 09 <small>prueba de vida</small></div>
+        <div class="bar">✠ 10 <small>prueba de vida</small></div>
         <ul class="log">
+          <li><span class="d">19.08.26</span><span>v6 — el reino toma sus nombres: curse, manifestations, clothes, reveletions, dark room, crypt, industries. entra el logo y el pergamino</span></li>
           <li><span class="d">02.08.26</span><span>v5 — entra material real: CYBERHELL, las cartas de curse n purse, el archivo</span></li>
           <li><span class="d">02.08.26</span><span>v4 — el humo se pliega, brasas, sangre que se funde, el portal gira</span></li>
           <li><span class="d">02.08.26</span><span>v3 — picos calcados de las reliquias, español primero</span></li>
@@ -312,12 +338,18 @@ const archivo = [
 
       <div class="ghost" aria-hidden="true">EXSIX</div>
 
+      <!-- PENTAGRAMA: siguiéndonos -->
+      <a class="penta" href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pent" /></svg>
+        <span>¡ siguiéndonos !</span>
+      </a>
+
       <!-- BADGES -->
       <div class="badges" aria-label="Insignias">
         <a class="badge bleed" href="#top">EXSIX ✠ X6</a>
-        <a class="badge" href="#manifiesto">SIN DIOSES</a>
+        <a class="badge" href="#curse">SIN DIOSES</a>
         <a class="badge" href="#libro">FIRMA EL LIBRO</a>
-        <a class="badge blink" href="#reliquias">EN VENTA</a>
+        <a class="badge blink" href="#clothes">EN VENTA</a>
         <a class="badge" href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">IG ↗</a>
         <a class="badge" href="https://www.youtube.com/@EXSIX" target="_blank" rel="noopener">YT ↗</a>
       </div>

@@ -456,3 +456,47 @@ button:hover{background:var(--blood);border-color:var(--blood)}
   .carta-in{transition:none}
   .obra figure:hover img{transform:none}
 }
+
+/* ── v6: los nombres del reino ── */
+.realm{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--ash);text-align:center;margin:0 0 .45rem;
+}
+.hero-logo{
+  width:min(74vw,500px);height:auto;display:block;margin:0 auto;
+  /* el logo nació sobre blanco: sin este empujón se funde con el void */
+  filter:brightness(1.55) saturate(1.35)
+         drop-shadow(0 0 3px rgba(255,46,57,.55))
+         drop-shadow(0 0 26px rgba(179,0,12,.5));
+}
+.demons{
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.52em;text-transform:uppercase;
+  color:var(--bone);margin:1.7rem 0 0;padding-left:.52em;position:relative;z-index:1;
+}
+/* el pergamino de CURSE: bordes rasgados arriba y abajo */
+.scroll{
+  background:var(--bone);color:#181310;
+  padding:clamp(1.8rem,7vw,2.8rem) clamp(1.4rem,6vw,2.4rem);
+  margin:1.5rem 0;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:1.02rem;line-height:1.78;
+  clip-path:polygon(0 3.2%,3% 1%,7% 2.4%,13% .6%,19% 2.8%,26% 1.2%,34% 2.6%,41% .4%,50% 2.2%,58% .8%,66% 2.6%,74% 1%,81% 2.4%,88% .6%,94% 2.2%,100% 1%,100% 97.4%,96% 99.2%,90% 97.8%,83% 99.4%,75% 97.6%,67% 99.2%,58% 98%,49% 99.6%,40% 97.8%,32% 99.2%,24% 97.6%,16% 99.4%,9% 98%,4% 99.4%,0 98%);
+}
+.scroll p{margin:0;max-width:60ch}
+.scroll p:first-of-type::first-letter{
+  font-family:var(--fraktur);font-size:3.2em;line-height:.78;
+  float:left;margin:.06em .14em 0 0;color:var(--blood);
+}
+.scroll .sello{margin:1.2rem 0 0;text-align:center;font-size:1.5rem;color:var(--blood)}
+/* pentagrama de "siguiéndonos" */
+.penta{
+  display:flex;flex-direction:column;align-items:center;gap:.55rem;
+  width:max-content;margin:3rem auto 1.4rem;text-decoration:none;
+  font-family:var(--pixel);font-size:clamp(1.2rem,4vw,1.5rem);color:var(--blood-lit);
+}
+.penta svg{width:66px;height:66px;fill:none;stroke:var(--blood-lit);stroke-width:1.1;stroke-linejoin:miter}
+.penta:hover{color:var(--bone)}
+.penta:hover svg{stroke:var(--bone)}
+@media (prefers-reduced-motion:no-preference){
+  .penta svg{animation:turn 26s linear infinite}
+}
