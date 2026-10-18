@@ -33,11 +33,6 @@ a:hover{color:var(--blood-lit)}
 
 /* ---- the veil (webgl canvas) sits under everything ---- */
 #veil{position:fixed;inset:0;width:100vw;height:100dvh;z-index:0;pointer-events:none}
-/* film grain above all, never clickable */
-.grain{
-  position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.14;mix-blend-mode:screen;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
 
 /* ---- shell: one centered column, like the old shrines ---- */
 .shell{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 14px 40px}
