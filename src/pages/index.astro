@@ -76,6 +76,7 @@ const archivo = [
   <Veil />
   <div class="lens" aria-hidden="true"></div>
 
+  <script is:inline>document.documentElement.classList.add("rooms")</script>
   <div class="shell">
     <main>
       <!-- ALTAR: el logo al centro, el sigilo girando detrás, el reino inscrito alrededor como sello -->
@@ -332,6 +333,13 @@ const archivo = [
         <a class="badge" href="https://www.youtube.com/@EXSIX" target="_blank" rel="noopener">YT ↗</a>
       </div>
     </main>
+
+    <!-- PUERTAS: solo dentro de una habitación -->
+    <nav class="doors" aria-label="Puertas">
+      <a class="door prev" href="#"><b>◄</b> <span></span></a>
+      <a class="door up" href="#altar">⛧ altar</a>
+      <a class="door next" href="#"><span></span> <b>►</b></a>
+    </nav>
 
     <footer class="foot">
       <p class="ring"><a href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">◄ ant</a> · webring gótico · <a href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">sig ►</a></p>

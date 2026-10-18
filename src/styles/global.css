@@ -514,3 +514,22 @@ button:hover{background:var(--blood);border-color:var(--blood)}
   24%{filter:brightness(1.75) saturate(1.42) drop-shadow(0 0 4px rgba(255,46,57,.75)) drop-shadow(0 0 42px rgba(179,0,12,.75));transform:scale(1.008)}
   44%,100%{filter:brightness(1.55) saturate(1.35) drop-shadow(0 0 3px rgba(255,46,57,.55)) drop-shadow(0 0 26px rgba(179,0,12,.5));transform:none}
 }
+
+/* ── habitaciones: el altar es el vestíbulo; cada sección es un cuarto, sin scroll entre ellos ── */
+html.rooms .ordo:not(.on),html.rooms .ordo:not(.on)+.box{display:none}
+html[data-room] :is(.altar,.ghost,.penta,.badges){display:none}
+.doors{display:none;justify-content:space-between;align-items:center;gap:.6rem;margin:1.6rem 0 2.2rem;flex-wrap:wrap}
+html[data-room] .doors{display:flex}
+.door{
+  font-family:var(--pixel);font-size:1.35rem;line-height:1;text-decoration:none;color:var(--bone);
+  border:1px solid var(--hair-dim);padding:.45em .8em .35em;
+  text-shadow:0 0 8px rgba(255,46,57,.7),0 0 20px rgba(179,0,12,.7);
+}
+.door b{color:var(--blood-lit);font-weight:400}
+.door:hover,.door:focus-visible{color:var(--blood-lit);border-color:var(--blood)}
+.door.up{color:var(--ash)}
+.door[hidden]{display:none}
+html.rooms .ordo.on{scroll-margin-top:0}
+.crest:focus{outline:0}
+.ordo:focus{outline:0}
+html[data-room] main{padding-top:clamp(1.2rem,4vw,2.2rem)}
