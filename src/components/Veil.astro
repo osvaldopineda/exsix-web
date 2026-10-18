@@ -33,28 +33,38 @@ void main(){
   vec2 p=uv*vec2(asp,1.);
   float t=u_t*.03;
   vec2 mp=(u_m-.5)*vec2(asp,1.);
+  /* heartbeat ~66 bpm: lub, then a softer dub */
+  float ph=fract(u_t*1.1);
+  float beat=exp(-ph*9.)+.5*exp(-max(ph-.24,0.)*14.)*step(.24,ph);
+  /* peristalsis: the wall slowly crawls; the beat squeezes it inward */
+  p.y+=.035*sin(p.x*2.6+u_t*.5);
+  p=(p-vec2(asp*.5,.5))*(1.-beat*.018)+vec2(asp*.5,.5);
   float f=tar(p,t);
-  /* the cursor drags the goo up toward itself */
   float pull=smoothstep(.65,.0,distance(uv,u_m))*.28;
   float depth=mix(.6,.32,uv.y);
-  float hgt=f+pull+depth-.5;
+  float hgt=f+pull+depth-.5+beat*.05;
   float blob=smoothstep(.36,.64,hgt);
-  /* normals from the height field: this is what makes it wet */
+  float thick=smoothstep(.55,.95,hgt);
 #ifdef GL_OES_standard_derivatives
-  vec3 N=normalize(vec3(-dFdx(hgt)*330.,-dFdy(hgt)*330.,1.));
+  vec3 N=normalize(vec3(-dFdx(hgt)*240.,-dFdy(hgt)*240.,1.));
 #else
   vec2 e=vec2(.012,0.);
   vec3 N=normalize(vec3(-(tar(p+e.xy,t)-f)*60.,-(tar(p+e.yx,t)-f)*60.,1.));
 #endif
   vec3 L=normalize(vec3((mp-(p-vec2(asp*.5,.5)))*2.,.7));
   vec3 V=vec3(0.,0.,1.);
-  float spec=pow(max(dot(N,normalize(L+V)),0.),40.);
+  float spec=pow(max(dot(N,normalize(L+V)),0.),32.);
   float rim=pow(1.-max(dot(N,V),0.),2.6);
-  /* rotten blood under tar black; oil film at the edges; cold wet highlight */
-  vec3 base=mix(vec3(.018,0.,.004),vec3(.21,0.,.018),blob);
+  /* raw meat under the tar; light bleeds through where it's thick */
+  vec3 base=mix(vec3(.02,0.,.004),vec3(.24,.012,.022),blob);
+  vec3 sss=vec3(.42,.05,.06)*thick*(.7+.5*beat);
   float irid=.5+.5*sin(dot(N.xy,vec2(9.,7.))+hgt*14.);
-  vec3 film=mix(vec3(.09,0.,.16),vec3(0.,.1,.08),irid);
-  vec3 col=base+film*rim*blob+vec3(.92,.86,.8)*spec*blob*(.55+.45*blob);
+  vec3 film=mix(vec3(.12,0.,.14),vec3(.05,.08,.07),irid);
+  /* veins: thin ridges that flush with every beat */
+  float vn=fbm(p*3.4+vec2(t*.6,-t*.4));
+  float vein=smoothstep(.055,0.,abs(vn-.5))*blob;
+  vec3 col=base+sss+film*rim*blob+vec3(.95,.72,.7)*spec*blob*(.5+.5*blob)*(.75+.5*beat);
+  col+=vec3(.6,.03,.05)*vein*(.45+.75*beat);
   /* bubbles: slow, inside the goo, ring highlights */
   vec2 ep=vec2(p.x,p.y-u_t*.014)*28.;
   vec2 cell=floor(ep);
