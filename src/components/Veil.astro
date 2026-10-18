@@ -38,25 +38,25 @@ void main(){
   float f=tar(p,t);
   /* the cursor drags the goo up toward itself */
   float pull=smoothstep(.65,.0,distance(uv,u_m))*.28;
-  float depth=mix(.64,.08,uv.y);
+  float depth=mix(.6,.32,uv.y);
   float hgt=f+pull+depth-.5;
-  float blob=smoothstep(.42,.72,hgt);
+  float blob=smoothstep(.36,.64,hgt);
   /* normals from the height field: this is what makes it wet */
 #ifdef GL_OES_standard_derivatives
-  vec3 N=normalize(vec3(-dFdx(hgt)*110.,-dFdy(hgt)*110.,1.));
+  vec3 N=normalize(vec3(-dFdx(hgt)*220.,-dFdy(hgt)*220.,1.));
 #else
   vec2 e=vec2(.012,0.);
   vec3 N=normalize(vec3(-(tar(p+e.xy,t)-f)*60.,-(tar(p+e.yx,t)-f)*60.,1.));
 #endif
   vec3 L=normalize(vec3((mp-(p-vec2(asp*.5,.5)))*2.,.7));
   vec3 V=vec3(0.,0.,1.);
-  float spec=pow(max(dot(N,normalize(L+V)),0.),90.);
-  float rim=pow(1.-max(dot(N,V),0.),3.5);
+  float spec=pow(max(dot(N,normalize(L+V)),0.),40.);
+  float rim=pow(1.-max(dot(N,V),0.),2.6);
   /* rotten blood under tar black; oil film at the edges; cold wet highlight */
-  vec3 base=mix(vec3(.012,0.,.003),vec3(.13,.012,.01),blob);
+  vec3 base=mix(vec3(.018,0.,.004),vec3(.21,0.,.018),blob);
   float irid=.5+.5*sin(dot(N.xy,vec2(9.,7.))+hgt*14.);
   vec3 film=mix(vec3(.09,0.,.16),vec3(0.,.1,.08),irid);
-  vec3 col=base+film*rim*blob*.6+vec3(.75,.62,.58)*spec*blob*blob*.5;
+  vec3 col=base+film*rim*blob+vec3(.92,.86,.8)*spec*blob*(.55+.45*blob);
   /* posterize + bayer: still a 1-bit shrine, just a wetter one */
   col=floor(col*6.+bayer4(gl_FragCoord.xy))/6.;
   /* bubbles: slow, inside the goo, ring highlights */
@@ -65,7 +65,7 @@ void main(){
   float e=step(.986,h(cell));
   float rr=length(fract(ep)-.5);
   float bub=e*smoothstep(.035,0.,abs(rr-.27))*blob*(.6+.4*sin(u_t*1.3+h(cell)*40.));
-  col+=vec3(.45,.07,.09)*bub;
+  col+=vec3(.7,.12,.14)*bub;
   gl_FragColor=vec4(col,1.);
 }`;
     const VERT = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
