@@ -42,38 +42,6 @@ a:hover{color:var(--blood-lit)}
 /* ---- shell: one centered column, like the old shrines ---- */
 .shell{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 14px 40px}
 
-/* masthead */
-.mast{
-  display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;
-  padding:14px 2px 10px;
-  font-family:var(--pixel);font-size:1.15rem;line-height:1;color:var(--ash);
-}
-.mast .site{color:var(--bone);font-size:1.5rem}
-.mast .site em{font-style:normal;color:var(--blood-lit)}
-
-/* marquee ticker */
-.tick{
-  border:1px solid var(--hair);border-left:0;border-right:0;
-  overflow:hidden;padding:6px 0;margin-bottom:22px;background:rgba(12,10,10,.6);
-}
-.tick div{
-  display:flex;gap:2.4rem;width:max-content;white-space:nowrap;
-  font-family:var(--pixel);font-size:1.25rem;line-height:1;color:var(--ash);
-  animation:tick 40s linear infinite;
-}
-.tick span{color:var(--blood-lit)}
-@keyframes tick{to{transform:translateX(-50%)}}
-
-/* nav */
-.nav{
-  display:flex;flex-wrap:wrap;gap:.35rem .5rem;justify-content:center;
-  margin:0 0 26px;padding:0;list-style:none;
-}
-.nav a{
-  display:block;border:1px solid var(--hair-dim);padding:.35rem .8rem .25rem;
-  font-family:var(--pixel);font-size:1.3rem;line-height:1;text-decoration:none;color:var(--ash);
-}
-.nav a:hover{border-color:var(--bone);color:var(--void);background:var(--bone)}
 
 /* ---- boxes: the whole page is boxes, that IS the layout ---- */
 .box{
@@ -202,37 +170,28 @@ h1,h2{font-family:var(--fraktur);font-weight:400;margin:0}
   -webkit-mask:url('/traced/bat-frame.svg') top center/100% auto no-repeat;
   mask:url('/traced/bat-frame.svg') top center/100% auto no-repeat;
 }
-.hero{padding:clamp(3.4rem,12vw,5.5rem) clamp(2.2rem,9vw,4.5rem) clamp(4.6rem,16vw,6.5rem)}
 
-/* hero */
-.hero{text-align:center;padding-top:2.6rem;padding-bottom:2.4rem;overflow:hidden}
 /* foto real de ellos detrás del sigilo, quemada a duotono para que no compita */
 .hero-plate{
   position:absolute;inset:0;pointer-events:none;
   background:url('/media/fotos/xg-chatarra.webp') center 22%/cover no-repeat;
   filter:grayscale(1) contrast(1.5) brightness(.5);
-  mask:radial-gradient(72% 60% at 50% 42%,#000 20%,transparent 78%);
-  -webkit-mask:radial-gradient(72% 60% at 50% 42%,#000 20%,transparent 78%);
+  mask:radial-gradient(circle,#000 18%,transparent 62%);
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 62%);
   opacity:.5;mix-blend-mode:luminosity;
-}
-.hero .sigil{width:min(56vw,240px);height:auto;display:block;margin:0 auto 1.2rem}
-.hero h1{
-  font-size:clamp(3.4rem,15vw,7rem);line-height:.95;
-  /* carve the title out of the thorns behind it */
-  text-shadow:0 0 14px var(--void),0 0 28px var(--void),0 0 42px var(--void);
 }
 @media(min-width:720px){.frame-chrome{opacity:.62}}
 @media(prefers-reduced-motion:no-preference){
   /* candle flicker: rare, sharp, uneven — steps(1), no fade */
-  .hero h1{animation:flicker 8s steps(1) infinite}
+  .crest{animation:flicker 8s steps(1) infinite}
 }
 @keyframes flicker{
   0%,91.9%,93.1%,94.9%,95.6%,100%{opacity:1}
   92%,92.4%{opacity:.5}
   95%,95.3%{opacity:.8}
 }
-.hero .sub{font-family:var(--pixel);font-size:clamp(1.2rem,4vw,1.6rem);line-height:1;color:var(--ash);margin:.7rem 0 0}
-.hero .sub b{color:var(--blood-lit);font-weight:400}
+.sub{font-family:var(--pixel);font-size:clamp(1.2rem,4vw,1.6rem);line-height:1;color:var(--ash);margin:.7rem 0 0}
+.sub b{color:var(--blood-lit);font-weight:400}
 .sigil .thread{fill:none;stroke:var(--hair);stroke-width:1}
 .sigil .fang{fill:var(--blood);stroke:none}
 .sigil .fang.minor{fill:var(--blood-lit);opacity:.7}
@@ -451,19 +410,14 @@ button:hover{background:var(--blood);border-color:var(--blood)}
 
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .tick div{animation:none}
   .badge.blink{animation:none}
   .carta-in{transition:none}
   .obra figure:hover img{transform:none}
 }
 
 /* ── v6: los nombres del reino ── */
-.realm{
-  font-family:var(--mono);font-size:.6rem;letter-spacing:.34em;text-transform:uppercase;
-  color:var(--ash);text-align:center;margin:0 0 .45rem;
-}
 .hero-logo{
-  width:min(74vw,500px);height:auto;display:block;margin:0 auto;
+  width:min(64vw,500px);height:auto;display:block;margin:0 auto;
   /* el logo nació sobre blanco: sin este empujón se funde con el void */
   filter:brightness(1.55) saturate(1.35)
          drop-shadow(0 0 3px rgba(255,46,57,.55))
@@ -471,7 +425,7 @@ button:hover{background:var(--blood);border-color:var(--blood)}
 }
 .demons{
   font-family:var(--mono);font-size:.64rem;letter-spacing:.52em;text-transform:uppercase;
-  color:var(--bone);margin:1.7rem 0 0;padding-left:.52em;position:relative;z-index:1;
+  color:var(--bone);margin:1.1rem 0 0;padding-left:.52em;position:relative;z-index:1;
   /* los thorns del marco son hueso: sin halo oscuro las puntas se comen letras */
   text-shadow:0 0 4px var(--void),0 0 4px var(--void),0 0 10px var(--void);
 }
@@ -501,4 +455,56 @@ button:hover{background:var(--blood);border-color:var(--blood)}
 .penta:hover svg{stroke:var(--bone)}
 @media (prefers-reduced-motion:no-preference){
   .penta svg{animation:turn 26s linear infinite}
+}
+
+/* ── el altar: logo al centro, sigilo girando detrás, el reino inscrito alrededor ── */
+.altar{
+  --side:min(100vw - 28px,640px);
+  position:relative;width:var(--side);height:var(--side);margin:clamp(1.4rem,4vw,2rem) auto clamp(1.6rem,5vw,2.6rem);
+}
+.altar .sigil{position:absolute;inset:0;width:100%;height:100%;opacity:.7}
+.core{
+  position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;pointer-events:none;
+}
+.crest{margin:0}
+.sub{margin:.5rem 0 0}
+/* las ocho puertas, escritas sobre la circunferencia como un sello */
+.orb{
+  position:absolute;inset:0;margin:0;padding:0;list-style:none;z-index:3;
+  --r:calc(var(--side) / 2 - 1em);
+}
+.orb li{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(calc(var(--i) * 45deg)) translateY(calc(-1 * var(--r)));
+}
+.orb a{
+  display:block;white-space:nowrap;text-decoration:none;
+  font-family:var(--pixel);font-size:clamp(1.15rem,3.6vw,1.5rem);line-height:1;color:var(--bone);
+  letter-spacing:.04em;padding:.2em .4em;
+  text-shadow:0 0 4px var(--void),0 0 10px var(--void),0 0 8px rgba(255,46,57,.55),0 0 22px rgba(179,0,12,.6);
+  transition:color .15s,letter-spacing .25s;
+}
+/* la mitad de abajo se lee desde afuera */
+.orb li:nth-child(n+4):nth-child(-n+6) a{rotate:180deg}
+.orb a b{color:var(--blood-lit);font-weight:400;margin-right:.35em;display:inline-block}
+.orb a:hover,.orb a:focus-visible{color:var(--blood-lit);letter-spacing:.14em}
+@media(prefers-reduced-motion:no-preference){
+  /* una señal roja recorre las ocho puertas */
+  .orb a b{animation:beacon 4s steps(1) infinite;animation-delay:calc(var(--i) * .5s)}
+  /* el logo respira */
+  .hero-logo{animation:breathe 5s ease-in-out infinite}
+  /* tocar una puerta sacude el logo */
+  .altar:has(.orb a:hover) .hero-logo{animation:rip .32s steps(2) infinite}
+  .orb a:hover b{animation:turn 1.2s linear infinite}
+}
+@keyframes beacon{0%,12%{color:var(--bone);text-shadow:0 0 10px var(--bone)}12.5%,100%{color:var(--blood-lit);text-shadow:none}}
+@keyframes breathe{
+  50%{filter:brightness(1.85) saturate(1.5) drop-shadow(0 0 5px rgba(255,46,57,.8)) drop-shadow(0 0 52px rgba(179,0,12,.85))}
+}
+@keyframes rip{
+  0%{transform:translate(-4px,1px) skewX(3deg)}
+  33%{transform:translate(4px,-2px) skewX(-4deg)}
+  66%{transform:translate(-2px,3px)}
+  100%{transform:none}
 }

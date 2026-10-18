@@ -4,7 +4,6 @@ import Carta from '../components/Carta.astro';
 import { curse, PRECIO } from '../data/curse';
 import { ritos } from '../data/rites';
 import '../styles/global.css';
-const updated = '19.08.2026';
 const colectivo = [
   { who: 'SAYAN SYN', role: 'música', rot: 0 },
   { who: 'EXSIX BLOOD', role: 'cámaras · visuales', rot: 180 },
@@ -79,39 +78,11 @@ const archivo = [
   <div class="lens" aria-hidden="true"></div>
 
   <div class="shell">
-    <header class="mast">
-      <span class="site">EXSIX<em>.</em>NET</span>
-      <span>est. MMXXVI</span>
-      <span>última actualización: {updated}</span>
-    </header>
-
-    <div class="tick" aria-hidden="true">
-      <div>
-        <span>⛧</span> bienvenido al santuario <span>⛧</span> sin dioses ni sellos <span>⛧</span> sayan syn × exsix blood <span>⛧</span> curse n purse a la venta <span>⛧</span> firma el libro
-        <span>⛧</span> bienvenido al santuario <span>⛧</span> sin dioses ni sellos <span>⛧</span> sayan syn × exsix blood <span>⛧</span> curse n purse a la venta <span>⛧</span> firma el libro
-      </div>
-    </div>
-
-    <nav aria-label="Realm — índice del sitio">
-      <p class="realm" aria-hidden="true">⛧ realm ⛧</p>
-      <ul class="nav">
-        <li><a href="#curse">curse</a></li>
-        <li><a href="#manifestations">manifestations</a></li>
-        <li><a href="#clothes">clothes</a></li>
-        <li><a href="#reveletions">reveletions</a></li>
-        <li><a href="#darkroom">dark room</a></li>
-        <li><a href="#crypt">crypt</a></li>
-        <li><a href="#industries">industries</a></li>
-        <li><a href="#libro">libro</a></li>
-      </ul>
-    </nav>
-
     <main>
-      <!-- PORTAL: enmarcado con los thorns cromados calcados de la ref -->
-      <section class="box hero">
+      <!-- ALTAR: el logo al centro, el sigilo girando detrás, el reino inscrito alrededor como sello -->
+      <section class="altar" aria-label="EXSIX">
         <div class="hero-plate" aria-hidden="true"></div>
-        <div class="frame-art frame-chrome" aria-hidden="true"></div>
-        <svg class="sigil" viewBox="0 0 400 400" role="img" aria-label="Sigilo de EXSIX: las letras XG dentro de un anillo de seis puntas">
+        <svg class="sigil" viewBox="0 0 400 400" aria-hidden="true">
           <g class="halo">
             <circle class="thread" cx="200" cy="200" r="178" />
             <circle class="thread" cx="200" cy="200" r="150" stroke-dasharray="2 7" />
@@ -124,11 +95,19 @@ const archivo = [
               <path class="fang minor" d="M197 24 L200 0 L203 24 Z" transform={`rotate(${a} 200 200)`} />
             ))}
           </g>
-          <text class="glyph" x="200" y="252">XG</text>
         </svg>
-        <h1><img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" /></h1>
-        <p class="demons">exsix demons</p>
-        <p class="sub">sonido <b>⛧</b> film <b>⛧</b> ropa</p>
+        <div class="core">
+          <h1 class="crest"><img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" /></h1>
+          <p class="demons">exsix demons</p>
+          <p class="sub">sonido <b>⛧</b> film <b>⛧</b> ropa</p>
+        </div>
+        <nav aria-label="Realm — índice del sitio">
+          <ul class="orb">
+            {[['curse','curse'],['manifestations','manifestations'],['clothes','clothes'],['reveletions','reveletions'],['darkroom','dark room'],['crypt','crypt'],['industries','industries'],['libro','libro']].map(([id,n],i) => (
+              <li style={`--i:${i}`}><a href={`#${id}`}><b aria-hidden="true">⛧</b>{n}</a></li>
+            ))}
+          </ul>
+        </nav>
       </section>
 
       <!-- CURSE: el manifiesto real, en pergamino -->
