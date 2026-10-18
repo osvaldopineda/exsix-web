@@ -36,6 +36,14 @@ a:hover{color:var(--blood-lit)}
 
 /* ---- shell: one centered column, like the old shrines ---- */
 .shell{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 14px 40px}
+/* el descenso: la página se hunde hacia el centro del sello y emerge en el nuevo tejido */
+@media(prefers-reduced-motion:no-preference){
+  .shell{transition:transform .55s cubic-bezier(.7,0,.25,1),filter .55s ease,opacity .55s ease;transform-origin:50% calc(var(--sy,0px) + 42vh)}
+  html.dive .shell{transform:scale(1.26);filter:blur(7px);opacity:.08}
+  html.jump .shell{transition:none;transform:none;filter:blur(5px);opacity:0}
+  html.arrive .shell{transition:none;transform:scale(.9);filter:blur(5px);opacity:0}
+}
+html.jump{scroll-behavior:auto}
 
 
 /* ---- boxes: the whole page is boxes, that IS the layout ---- */
