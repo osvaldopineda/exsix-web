@@ -1,4 +1,4 @@
-{/* The Veil v2 — domain-warped 1-bit blood fog + rising embers.
+{/* The Veil v3 — tar: warped height field, wet specular that follows the cursor, oil-film rims, bubbles.
    Mouse-reactive on desktop, scroll-reactive on touch (90% of visits).
    Renders at 1/3 res on purpose: chunky pixels ARE the look. */}
 <canvas id="veil" aria-hidden="true"></canvas>
@@ -6,11 +6,15 @@
 <script>
   const cv = document.getElementById('veil') as HTMLCanvasElement;
   const gl = cv.getContext('webgl', { antialias: false, alpha: false });
+  gl?.getExtension('OES_standard_derivatives');
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const touch = matchMedia('(hover: none)').matches;
 
   if (gl) {
     const FRAG = `
+#ifdef GL_OES_standard_derivatives
+#extension GL_OES_standard_derivatives : enable
+#endif
 precision mediump float;
 uniform vec2 u_res; uniform float u_t; uniform vec2 u_m;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -19,26 +23,49 @@ float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}
 float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
 float bayer4(vec2 a){return bayer2(.5*a)*.25+bayer2(a);}
+/* tar: warp of a warp, slow — it folds, it never drifts */
+float tar(vec2 p,float t){
+  vec2 q=vec2(fbm(p*1.1+vec2(t*.3,-t*.2)),fbm(p*1.2-vec2(t*.25,t*.35)));
+  vec2 r=vec2(fbm(p*1.7+3.2*q+vec2(t*.1,0.)),fbm(p*1.7+3.2*q-vec2(0.,t*.15)));
+  return fbm(p*2.1+2.6*r);
+}
 void main(){
   vec2 uv=gl_FragCoord.xy/u_res;
-  vec2 p=uv*vec2(u_res.x/u_res.y,1.);
-  float t=u_t*.05;
-  /* domain warp: smoke folding into itself instead of drifting flatly */
-  vec2 q=vec2(fbm(p*1.6+vec2(t*.5,-t*.3)),fbm(p*1.8-vec2(t*.4,t*.6)));
-  float f=fbm(p*2.6+2.2*q+(u_m-.5)*.5);
-  float pull=smoothstep(.55,.0,distance(uv,u_m))*.55;
-  float breathe=.88+.12*sin(u_t*.45);
-  float depth=mix(.72,.12,uv.y);
-  float fog=f*(depth+pull)*breathe;
-  float on=step(bayer4(gl_FragCoord.xy),fog*1.2-.2);
-  float deep=step(bayer4(gl_FragCoord.xy+2.),fog*1.2-.48);
-  vec3 col=vec3(.45,0.,.032)*on+vec3(.3,.004,.02)*deep;
-  /* embers: sparse cells climbing, each flickering out of phase */
-  vec2 ep=vec2(p.x,p.y-u_t*.045)*52.;
+  float asp=u_res.x/u_res.y;
+  vec2 p=uv*vec2(asp,1.);
+  float t=u_t*.03;
+  vec2 mp=(u_m-.5)*vec2(asp,1.);
+  float f=tar(p,t);
+  /* the cursor drags the goo up toward itself */
+  float pull=smoothstep(.65,.0,distance(uv,u_m))*.28;
+  float depth=mix(.64,.08,uv.y);
+  float hgt=f+pull+depth-.5;
+  float blob=smoothstep(.42,.72,hgt);
+  /* normals from the height field: this is what makes it wet */
+#ifdef GL_OES_standard_derivatives
+  vec3 N=normalize(vec3(-dFdx(hgt)*110.,-dFdy(hgt)*110.,1.));
+#else
+  vec2 e=vec2(.012,0.);
+  vec3 N=normalize(vec3(-(tar(p+e.xy,t)-f)*60.,-(tar(p+e.yx,t)-f)*60.,1.));
+#endif
+  vec3 L=normalize(vec3((mp-(p-vec2(asp*.5,.5)))*2.,.7));
+  vec3 V=vec3(0.,0.,1.);
+  float spec=pow(max(dot(N,normalize(L+V)),0.),90.);
+  float rim=pow(1.-max(dot(N,V),0.),3.5);
+  /* rotten blood under tar black; oil film at the edges; cold wet highlight */
+  vec3 base=mix(vec3(.012,0.,.003),vec3(.13,.012,.01),blob);
+  float irid=.5+.5*sin(dot(N.xy,vec2(9.,7.))+hgt*14.);
+  vec3 film=mix(vec3(.09,0.,.16),vec3(0.,.1,.08),irid);
+  vec3 col=base+film*rim*blob*.6+vec3(.75,.62,.58)*spec*blob*blob*.5;
+  /* posterize + bayer: still a 1-bit shrine, just a wetter one */
+  col=floor(col*6.+bayer4(gl_FragCoord.xy))/6.;
+  /* bubbles: slow, inside the goo, ring highlights */
+  vec2 ep=vec2(p.x,p.y-u_t*.014)*28.;
   vec2 cell=floor(ep);
-  float e=step(.9962,h(cell));
-  float spark=e*smoothstep(.42,.0,length(fract(ep)-.5))*(.5+.5*sin(u_t*6.+h(cell)*44.));
-  col+=vec3(1.,.16,.2)*spark*.85;
+  float e=step(.986,h(cell));
+  float rr=length(fract(ep)-.5);
+  float bub=e*smoothstep(.035,0.,abs(rr-.27))*blob*(.6+.4*sin(u_t*1.3+h(cell)*40.));
+  col+=vec3(.45,.07,.09)*bub;
   gl_FragColor=vec4(col,1.);
 }`;
     const VERT = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
@@ -75,7 +102,7 @@ void main(){
         ty = 1 - (max > 0 ? scrollY / max : 0) * 0.85;
         tx = 0.5 + Math.sin(ms / 9000) * 0.2;
       }
-      mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
+      mx += (tx - mx) * 0.025; my += (ty - my) * 0.025;
       gl.uniform1f(uT, ms / 1000); gl.uniform2f(uM, mx, my);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
