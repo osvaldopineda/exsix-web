@@ -1,6 +1,6 @@
 {/* The Veil v3 — tar: warped height field, wet specular that follows the cursor, oil-film rims, bubbles.
    Mouse-reactive on desktop, scroll-reactive on touch (90% of visits).
-   Renders at 1/3 res on purpose: chunky pixels ARE the look. */}
+   Renders at 1/2 res, upscaled smooth: no dither, no pixels — liquid. */}
 <canvas id="veil" aria-hidden="true"></canvas>
 
 <script>
@@ -20,9 +20,7 @@ uniform vec2 u_res; uniform float u_t; uniform vec2 u_m;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+1.),f.x),f.y);}
-float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}
-float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
-float bayer4(vec2 a){return bayer2(.5*a)*.25+bayer2(a);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}
 /* tar: warp of a warp, slow — it folds, it never drifts */
 float tar(vec2 p,float t){
   vec2 q=vec2(fbm(p*1.1+vec2(t*.3,-t*.2)),fbm(p*1.2-vec2(t*.25,t*.35)));
@@ -43,7 +41,7 @@ void main(){
   float blob=smoothstep(.36,.64,hgt);
   /* normals from the height field: this is what makes it wet */
 #ifdef GL_OES_standard_derivatives
-  vec3 N=normalize(vec3(-dFdx(hgt)*220.,-dFdy(hgt)*220.,1.));
+  vec3 N=normalize(vec3(-dFdx(hgt)*330.,-dFdy(hgt)*330.,1.));
 #else
   vec2 e=vec2(.012,0.);
   vec3 N=normalize(vec3(-(tar(p+e.xy,t)-f)*60.,-(tar(p+e.yx,t)-f)*60.,1.));
@@ -57,8 +55,6 @@ void main(){
   float irid=.5+.5*sin(dot(N.xy,vec2(9.,7.))+hgt*14.);
   vec3 film=mix(vec3(.09,0.,.16),vec3(0.,.1,.08),irid);
   vec3 col=base+film*rim*blob+vec3(.92,.86,.8)*spec*blob*(.55+.45*blob);
-  /* posterize + bayer: still a 1-bit shrine, just a wetter one */
-  col=floor(col*6.+bayer4(gl_FragCoord.xy))/6.;
   /* bubbles: slow, inside the goo, ring highlights */
   vec2 ep=vec2(p.x,p.y-u_t*.014)*28.;
   vec2 cell=floor(ep);
@@ -83,8 +79,8 @@ void main(){
     const uRes = gl.getUniformLocation(pr, 'u_res'), uT = gl.getUniformLocation(pr, 'u_t'), uM = gl.getUniformLocation(pr, 'u_m');
 
     const size = () => {
-      cv.width = Math.max(2, Math.floor(innerWidth / 3));
-      cv.height = Math.max(2, Math.floor(innerHeight / 3));
+      cv.width = Math.max(2, Math.floor(innerWidth / 2));
+      cv.height = Math.max(2, Math.floor(innerHeight / 2));
       gl.viewport(0, 0, cv.width, cv.height);
       gl.uniform2f(uRes, cv.width, cv.height);
     };

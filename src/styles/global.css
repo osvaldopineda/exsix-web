@@ -32,7 +32,7 @@ a{color:var(--bone)}
 a:hover{color:var(--blood-lit)}
 
 /* ---- the veil (webgl canvas) sits under everything ---- */
-#veil{position:fixed;inset:0;width:100vw;height:100dvh;z-index:0;image-rendering:pixelated;pointer-events:none}
+#veil{position:fixed;inset:0;width:100vw;height:100dvh;z-index:0;pointer-events:none}
 /* film grain above all, never clickable */
 .grain{
   position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.14;mix-blend-mode:screen;
