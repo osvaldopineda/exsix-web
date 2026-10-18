@@ -3,7 +3,12 @@ import Veil from '../components/Veil.astro';
 import Carta from '../components/Carta.astro';
 import { curse, PRECIO } from '../data/curse';
 import { ritos } from '../data/rites';
+import { ep } from '../data/ep';
 import '../styles/global.css';
+// el sello es el reproductor: cada pista empieza en un ángulo del anillo interior
+const epTotal = ep.tracks.reduce((s, t) => s + t.dur, 0);
+let acc = 0;
+const pips = ep.tracks.map(t => { const a = acc / epTotal * 360; acc += t.dur; return { ...t, a }; });
 const colectivo = [
   { who: 'SAYAN SYN', role: 'música', rot: 0 },
   { who: 'EXSIX BLOOD', role: 'cámaras · visuales', rot: 180 },
@@ -75,6 +80,8 @@ const archivo = [
 
   <Veil />
   <div class="lens" aria-hidden="true"></div>
+  <!-- el EP: fuera del altar para que siga sonando dentro de los cuartos; sin src = cero bytes hasta el click -->
+  <audio id="ep" preload="none"></audio>
 
   <script is:inline>document.documentElement.classList.add("rooms")</script>
   <div class="shell">
@@ -95,10 +102,16 @@ const archivo = [
             ))}
           </g>
           <circle class="thread track" cx="200" cy="200" r="193" stroke-dasharray="1 5" />
+          <circle class="thread prog" cx="200" cy="200" r="150" pathLength="1" transform="rotate(-90 200 200)" />
         </svg>
         <div class="core">
-          <h1 class="crest"><img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" /></h1>
-          <p class="demons">exsix demons</p>
+          <h1 class="crest">
+            <button class="play" type="button" aria-pressed="false" aria-label={`EXSIX — reproducir el EP ${ep.title}`}>
+              <img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" />
+            </button>
+          </h1>
+          <p class="demons" aria-live="polite">exsix demons</p>
+          <p class="ep-time">0:00 / 0:00</p>
           <p class="sub">sonido <b>⛧</b> film <b>⛧</b> ropa</p>
         </div>
         <nav aria-label="Realm — índice del sitio">
@@ -108,6 +121,11 @@ const archivo = [
             ))}
           </ul>
         </nav>
+        <ol class="pips" aria-label="Pistas del EP">
+          {pips.map((t, j) => (
+            <li style={`--a:${t.a}deg`}><button type="button" data-n={j} aria-label={`Pista ${t.n} — ${t.titulo}`}>⛧</button></li>
+          ))}
+        </ol>
       </section>
 
       <!-- CURSE: el manifiesto real, en pergamino -->

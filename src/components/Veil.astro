@@ -4,11 +4,64 @@
 <canvas id="veil" aria-hidden="true"></canvas>
 
 <script>
+  import { ep } from '../data/ep';
   const cv = document.getElementById('veil') as HTMLCanvasElement;
   const gl = cv.getContext('webgl', { antialias: false, alpha: false });
   gl?.getExtension('OES_standard_derivatives');
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const touch = matchMedia('(hover: none)').matches;
+
+  /* ── el sello es el reproductor: <audio> vive fuera del altar y sigue sonando en los cuartos ── */
+  const au = document.getElementById('ep') as HTMLAudioElement;
+  const altar = document.querySelector<HTMLElement>('.altar')!;
+  const playBtn = altar.querySelector<HTMLButtonElement>('.play')!;
+  const pips = Array.from(altar.querySelectorAll<HTMLButtonElement>('.pips button'));
+  const now = altar.querySelector<HTMLElement>('.demons')!, clock = altar.querySelector<HTMLElement>('.ep-time')!;
+  const total = ep.tracks.reduce((s, t) => s + t.dur, 0);
+  let i = -1, kick = 0, tickRaf = 0, avg = 0;
+  let ctx: AudioContext | undefined, an: AnalyserNode | undefined;
+  const buf = new Uint8Array(3); // bins 0..2 con fftSize 512 @ 44.1k = 0–258 Hz: el bombo
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const load = (n: number) => {
+    i = n; const t = ep.tracks[n];
+    au.src = t.src;
+    now.textContent = `${String(t.n).padStart(2, '0')} · ${t.titulo}`;
+    altar.classList.add('ep');
+    pips.forEach((b, j) => j === n ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current'));
+    if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: t.titulo, artist: 'EXSIX', album: ep.title, artwork: [{ src: '/media/arte/logo-v6.webp', type: 'image/webp' }] });
+  };
+  const start = () => {            // siempre dentro del gesto: iOS lo exige para AudioContext y play()
+    if (i < 0) load(0);
+    if (!ctx && !still) {          // createMediaElementSource: una sola vez por elemento
+      ctx = new AudioContext(); an = ctx.createAnalyser(); an.fftSize = 512; an.smoothingTimeConstant = .3;
+      ctx.createMediaElementSource(au).connect(an); an.connect(ctx.destination);
+    }
+    ctx?.resume(); au.play().catch(() => {});
+  };
+  playBtn.addEventListener('click', () => au.paused ? start() : au.pause());
+  pips.forEach((b, n) => b.addEventListener('click', () => { load(n); start(); }));
+  au.addEventListener('ended', () => { if (i + 1 < ep.tracks.length) { load(i + 1); au.play(); } });
+  const tick = () => {
+    const before = ep.tracks.slice(0, i).reduce((s, t) => s + t.dur, 0);
+    altar.style.setProperty('--p', ((before + au.currentTime) / total).toFixed(4));
+    clock.textContent = `${fmt(au.currentTime)} / ${fmt(ep.tracks[i].dur)}`;
+    if (an) {
+      an.getByteFrequencyData(buf);
+      const e = (buf[0] + buf[1] + buf[2]) / 765;
+      avg += (e - avg) * .03;                                  // línea base adaptativa: el dron no cuenta, el golpe sí
+      kick = Math.max(kick * .86, Math.min(1, (e - avg) * 5)); // ponytail: ganancia 5 / caída .86 a ojo, ajustar con el EP real
+      altar.style.setProperty('--kick', kick.toFixed(3));
+    }
+    tickRaf = requestAnimationFrame(tick);
+  };
+  au.addEventListener('play', () => { altar.classList.add('playing'); playBtn.setAttribute('aria-pressed', 'true'); cancelAnimationFrame(tickRaf); tickRaf = requestAnimationFrame(tick); });
+  au.addEventListener('pause', () => { altar.classList.remove('playing'); playBtn.setAttribute('aria-pressed', 'false'); cancelAnimationFrame(tickRaf); kick = 0; altar.style.setProperty('--kick', '0'); });
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler('play', start);
+    navigator.mediaSession.setActionHandler('pause', () => au.pause());
+    navigator.mediaSession.setActionHandler('previoustrack', () => { load(Math.max(0, i - 1)); au.play(); });
+    navigator.mediaSession.setActionHandler('nexttrack', () => { load(Math.min(ep.tracks.length - 1, i + 1)); au.play(); });
+  }
 
   if (gl) {
     const FRAG = `
@@ -17,6 +70,7 @@
 #endif
 precision mediump float;
 uniform vec2 u_res; uniform float u_t; uniform vec2 u_m; uniform float u_dive;
+uniform vec2 u_kick; /* x: golpe grave 0..1 del analyser, y: reproduciendo 0..1 (suavizado) */
 /* tissue: colors dark/lit/glow/spec; k1 = vein, specPow, beat, stretch; k2 = scale, pits, cover, crawl */
 uniform vec3 u_c0,u_c1,u_c2,u_c3; uniform vec4 u_k1,u_k2;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -42,7 +96,9 @@ void main(){
   vec2 mp=(u_m-.5)*vec2(asp,1.);
   /* heartbeat ~66 bpm: lub, then a softer dub — amplitude is the tissue's */
   float ph=fract(u_t*1.1);
-  float beat=(exp(-ph*9.)+.5*exp(-max(ph-.24,0.)*14.)*step(.24,ph))*(u_k1.z+u_dive*1.5);
+  float synth=exp(-ph*9.)+.5*exp(-max(ph-.24,0.)*14.)*step(.24,ph);
+  /* mientras suena el EP el golpe real sustituye al latido sintético; a tejidos sin pulso se les presta uno */
+  float beat=mix(synth,u_kick.x*1.3,u_kick.y)*(max(u_k1.z,u_kick.y*.8)+u_dive*1.5);
   /* peristalsis: the wall crawls; the beat squeezes it inward */
   p.y+=.035*u_k2.w*sin(p.x*2.6+tt*.5);
   p=(p-vec2(asp*.5,.5))*(1.-beat*.018)+vec2(asp*.5,.5);
@@ -99,7 +155,7 @@ void main(){
     const loc = gl.getAttribLocation(pr, 'a');
     gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     const U = (n: string) => gl.getUniformLocation(pr, n);
-    const uRes = U('u_res'), uT = U('u_t'), uM = U('u_m'), uDive = U('u_dive');
+    const uRes = U('u_res'), uT = U('u_t'), uM = U('u_m'), uDive = U('u_dive'), uKick = U('u_kick');
     const uC = [U('u_c0'), U('u_c1'), U('u_c2'), U('u_c3')], uK = [U('u_k1'), U('u_k2')];
 
     /* a tissue = 20 floats: dark rgb, lit rgb, glow rgb, spec rgb, [vein specPow beat stretch], [scale pits cover crawl] */
@@ -128,7 +184,7 @@ void main(){
     const marks = Array.from(document.querySelectorAll<HTMLElement>('h2.ordo[id]'));
     const order = marks.map(h => h.id);
     const door = (k: string) => document.querySelector<HTMLAnchorElement>(`.doors .${k}`)!;
-    const show = (id: string | null) => {
+    const show = (id: string | null, focus = true) => {
       if (id) root.dataset.room = id; else delete root.dataset.room;
       marks.forEach(h => h.classList.toggle('on', h.id === id));
       const i = id ? order.indexOf(id) : -1;
@@ -140,10 +196,10 @@ void main(){
       set('next', i >= 0 && i < order.length - 1 ? order[i + 1] : undefined);
       scrollTo(0, 0);
       tgt = T[id ?? 'altar'] ?? T.altar;
-      const h = id ? marks[i] : document.querySelector<HTMLElement>('.crest');
-      if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); }
+      const h = id ? marks[i] : playBtn;
+      if (h && focus) { if (h !== playBtn) h.tabIndex = -1; h.focus({ preventScroll: true }); }
     };
-    let dive = 0, diveTo = 0;
+    let dive = 0, diveTo = 0, pl = 0;
     const go = (id: string | null, push = true) => {
       const url = id ? '#' + id : location.pathname;
       if (still) { show(id); if (push) history.pushState(null, '', url); return; }
@@ -168,7 +224,7 @@ void main(){
       else if (order.includes(id)) { e.preventDefault(); if (id !== root.dataset.room) go(id); }
     });
     addEventListener('popstate', () => go(fromHash(), false));
-    show(fromHash());
+    show(fromHash(), false);
 
     const size = () => {
       cv.width = Math.max(2, Math.floor(innerWidth / 2));
@@ -197,6 +253,7 @@ void main(){
       for (let i = 0; i < 20; i++) cur[i] += (tgt[i] - cur[i]) * k;
       push();
       gl.uniform1f(uT, ms / 1000); gl.uniform2f(uM, mx, my); gl.uniform1f(uDive, dive);
+      pl += ((au.paused ? 0 : 1) - pl) * .05; gl.uniform2f(uKick, kick, pl);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
     if (still) { frame(40000); }

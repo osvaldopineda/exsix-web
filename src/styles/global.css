@@ -422,9 +422,11 @@ button:hover{background:var(--blood);border-color:var(--blood)}
 .hero-logo{
   width:min(64vw,500px);height:auto;display:block;margin:0 auto;
   /* el logo nació sobre blanco: sin este empujón se funde con el void */
-  filter:brightness(1.55) saturate(1.35)
-         drop-shadow(0 0 3px rgba(255,46,57,.55))
-         drop-shadow(0 0 26px rgba(179,0,12,.5));
+  /* --kick (0..1) lo escribe el analyser del EP mientras suena */
+  filter:brightness(calc(1.55 + .45 * var(--kick,0))) saturate(1.35)
+         drop-shadow(0 0 calc(3px + 4px * var(--kick,0)) rgba(255,46,57,.55))
+         drop-shadow(0 0 calc(26px + 40px * var(--kick,0)) rgba(179,0,12,.5));
+  transform:scale(calc(1 + .02 * var(--kick,0)));
 }
 .demons{
   font-family:var(--mono);font-size:.64rem;letter-spacing:.52em;text-transform:uppercase;
@@ -480,6 +482,27 @@ button:hover{background:var(--blood);border-color:var(--blood)}
 }
 .crest{margin:0}
 .sub{margin:.5rem 0 0}
+/* el sello es el reproductor: el logo es play, el anillo interior es el progreso, los pips son las pistas */
+.play{display:block;border:0;background:0;padding:0;margin:0;pointer-events:auto;cursor:inherit;font:inherit}
+.play:focus-visible{outline:2px solid var(--blood-lit);outline-offset:8px}
+.altar .prog{stroke:var(--blood-lit);stroke-width:2.2;stroke-dasharray:var(--p,0) 1;opacity:.9}
+.ep-time{
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.3em;color:var(--ash);margin:.5rem 0 0;
+  position:relative;z-index:1;text-shadow:0 0 4px var(--void),0 0 10px var(--void);
+}
+.altar:not(.ep) .ep-time,.altar.ep .sub{display:none}
+/* los anillos cubren todo el altar: solo sus botones reciben clicks, el logo sigue tocable */
+.orb,.pips{pointer-events:none}
+.orb a,.pips button{pointer-events:auto}
+.pips{position:absolute;inset:0;margin:0;padding:0;list-style:none;z-index:3;--rp:calc(var(--side) * .375)}
+.pips li{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(var(--a)) translateY(calc(-1 * var(--rp)))}
+.pips button{
+  display:block;width:24px;height:24px;padding:0;border:0;background:0;color:var(--blood);
+  font-family:var(--pixel);font-size:1.1rem;line-height:24px;text-align:center;cursor:inherit;
+  text-shadow:0 0 6px var(--void);
+}
+.pips button:hover,.pips button:focus-visible,.pips button[aria-current="true"]{color:var(--blood-lit);text-shadow:0 0 8px var(--blood-lit)}
+@media(max-width:420px){.pips{--rp:calc(var(--side) * .375 - 6px)}}
 /* las ocho puertas, escritas sobre la circunferencia como un sello */
 .orb{
   position:absolute;inset:0;margin:0;padding:0;list-style:none;z-index:3;
@@ -504,7 +527,7 @@ button:hover{background:var(--blood);border-color:var(--blood)}
   /* una señal roja recorre las ocho puertas */
   .orb a b{animation:beacon 4s steps(1) infinite;animation-delay:calc(var(--i) * .5s)}
   /* tocar una puerta hace latir el logo con la carne (misma frecuencia que el shader: 1.1 Hz) */
-  .altar:has(.orb a:hover,.orb a:focus) .hero-logo{animation:heart .909s ease-out infinite}
+  .altar:not(.playing):has(.orb a:hover,.orb a:focus) .hero-logo{animation:heart .909s ease-out infinite}
   .orb a:hover b{animation:turn 1.2s linear infinite}
 }
 @keyframes beacon{0%,12%{color:var(--bone);text-shadow:0 0 10px var(--bone)}12.5%,100%{color:var(--blood-lit);text-shadow:none}}
@@ -533,3 +556,5 @@ html.rooms .ordo.on{scroll-margin-top:0}
 .crest:focus{outline:0}
 .ordo:focus{outline:0}
 html[data-room] main{padding-top:clamp(1.2rem,4vw,2.2rem)}
+/* el logo y los pips no heredan el hover rojo de los botones genéricos */
+.play:hover,.play:focus-visible,.pips button:hover,.pips button:focus-visible{background:transparent}
