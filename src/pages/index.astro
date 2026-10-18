@@ -85,15 +85,15 @@ const archivo = [
           <g class="halo">
             <circle class="thread" cx="200" cy="200" r="178" />
             <circle class="thread" cx="200" cy="200" r="150" stroke-dasharray="2 7" />
-            <path class="thread" d="M200 50 L70.1 275 L329.9 275 Z" />
-            <path class="thread" d="M200 350 L70.1 125 L329.9 125 Z" />
-            {[0, 60, 120, 180, 240, 300].map(a => (
+            <path class="thread star" d="M200 350 L111.8 78.6 L342.7 246.4 L57.3 246.4 L288.2 78.6 Z" />
+            {[180, 252, 324, 36, 108].map(a => (
               <path class="fang" d="M194 38 L200 -10 L206 38 L200 22 Z" transform={`rotate(${a} 200 200)`} />
             ))}
-            {[30, 90, 150, 210, 270, 330].map(a => (
+            {[0, 72, 144, 216, 288].map(a => (
               <path class="fang minor" d="M197 24 L200 0 L203 24 Z" transform={`rotate(${a} 200 200)`} />
             ))}
           </g>
+          <circle class="thread track" cx="200" cy="200" r="193" stroke-dasharray="1 5" />
         </svg>
         <div class="core">
           <h1 class="crest"><img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" /></h1>
