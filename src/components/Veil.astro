@@ -63,6 +63,74 @@
     navigator.mediaSession.setActionHandler('nexttrack', () => { load(Math.min(ep.tracks.length - 1, i + 1)); au.play(); });
   }
 
+  /* a tissue = 20 floats: dark rgb, lit rgb, glow rgb, spec rgb, [vein specPow beat stretch], [scale pits cover crawl] */
+  const T: Record<string, number[]> = {
+    altar:          [.02,0,.004,     .24,.012,.022,.42,.05,.06,  .95,.72,.7,   1,32,1,1,     1,0,0,1],      // víscera
+    curse:          [.02,0,.004,     .24,.012,.022,.42,.05,.06,  .95,.72,.7,   1,32,1,1,     1,0,.1,1],     // estómago
+    manifestations: [.03,.04,.005,   .35,.42,.04,  .45,.5,.05,   .95,1,.7,     .3,45,.4,1,   .8,0,.3,1.4],  // bilis
+    clothes:        [.03,.04,.05,    .55,.62,.66,  .25,.3,.34,   .9,.95,1,     .15,60,.2,1,  .7,.3,.3,.3],  // cartílago
+    reveletions:    [.04,.035,.03,   .42,.37,.31,  .16,.13,.1,   .5,.47,.42,   0,8,0,1,      1.4,1,.22,0],  // hueso
+    darkroom:       [.015,0,.003,    .16,0,.015,   .3,.02,.03,   .95,.9,.9,    0,50,.6,1,    1,0,.2,1.5],   // sangre
+    crypt:          [.01,.008,.02,   .08,.06,.1,   .17,.12,.3,   .7,.66,.85,   2.2,40,2.5,2, .8,0,.15,.4],  // nervio
+    industries:     [.08,.06,.02,    .65,.55,.2,   .6,.45,.1,    1,.95,.7,     .2,14,.3,1,   1.6,.8,.5,.2], // grasa
+    colectivo:      [.05,0,.01,      .42,.03,.04,  .5,.08,.06,   .9,.6,.55,    .6,20,1.6,3,  1,0,.2,1.2],   // músculo
+    libro:          [.03,0,.006,     .3,.02,.03,   .45,.06,.07,  .95,.75,.72,  1.2,28,1.1,1, .9,0,.3,1.1],  // entraña
+    bitacora:       [.06,.02,.03,    .5,.22,.26,   .6,.25,.3,    1,.85,.85,    .9,40,.5,1.5, .5,0,.4,.6],   // membrana
+  };
+  const cur = T.altar.slice(); let tgt = T.altar;
+  /* rooms: the altar is the lobby, every section is a room; a door is a dive, never a scroll */
+  const root = document.documentElement;
+  const marks = Array.from(document.querySelectorAll<HTMLElement>('h2.ordo[id]'));
+  const order = marks.map(h => h.id);
+  const door = (k: string) => document.querySelector<HTMLAnchorElement>(`.doors .${k}`)!;
+  /* el recorrido: EP → sus palabras → las fotos → la ropa → pedir → firma; fuera del camino manda el orden del DOM */
+  const PATH: Record<string, string> = { manifestations: 'curse', curse: 'darkroom', darkroom: 'clothes', clothes: 'industries', industries: 'libro' };
+  const BACK = Object.fromEntries(Object.entries(PATH).map(([a, b]) => [b, a]));
+  const STEP: Record<string, string> = { manifestations: 'el EP', curse: 'sus palabras', darkroom: 'las fotos', clothes: 'la ropa del EP', industries: 'pedir la tuya', libro: 'firma el libro' };
+  const show = (id: string | null, focus = true) => {
+    if (id) root.dataset.room = id; else delete root.dataset.room;
+    marks.forEach(h => h.classList.toggle('on', h.id === id));
+    const i = id ? order.indexOf(id) : -1;
+    const set = (k: string, to: string | undefined, step = false) => {
+      const a = door(k); a.hidden = !to; a.classList.toggle('step', step);
+      if (to) { a.href = '#' + to; a.querySelector('span')!.textContent = (step && STEP[to]) || marks[order.indexOf(to)].querySelector('b')!.textContent; }
+    };
+    const back = id ? BACK[id] : undefined, fwd = id ? PATH[id] : undefined;
+    set('prev', back || (i > 0 ? order[i - 1] : undefined), !!back);
+    set('next', fwd || (i >= 0 && i < order.length - 1 ? order[i + 1] : undefined), !!fwd);
+    scrollTo(0, 0);
+    tgt = T[id ?? 'altar'] ?? T.altar;
+    const h = id ? marks[i] : playBtn;
+    if (h && focus) { if (h !== playBtn) h.tabIndex = -1; h.focus({ preventScroll: true }); }
+  };
+  let dive = 0, diveTo = 0, pl = 0;
+  const go = (id: string | null, push = true) => {
+    const url = id ? '#' + id : location.pathname;
+    if (still) { show(id); if (push) history.pushState(null, '', url); return; }
+    diveTo = 1;
+    root.style.setProperty('--sy', scrollY + 'px');
+    root.classList.add('dive');
+    setTimeout(() => {
+      /* swap rooms with the page untransformed, then surface from small */
+      root.classList.remove('dive'); root.classList.add('jump'); void root.offsetWidth;
+      show(id); if (push) history.pushState(null, '', url);
+      root.style.setProperty('--sy', '0px');
+      root.classList.replace('jump', 'arrive'); void root.offsetWidth; root.classList.remove('arrive');
+      diveTo = 0;
+    }, 520);
+  };
+  const fromHash = () => { const h = location.hash.slice(1); return order.includes(h) ? h : null; };
+  document.addEventListener('click', e => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute('href')!.slice(1);
+    if (a.dataset.track) { e.preventDefault(); go(null); load(+a.dataset.track); start(); }  // "escuchar en el sello": vuelve y suena
+    else if (id === 'altar' || id === 'top' || id === '') { e.preventDefault(); go(null); }
+    else if (order.includes(id)) { e.preventDefault(); if (id !== root.dataset.room) go(id); }
+  });
+  addEventListener('popstate', () => go(fromHash(), false));
+  show(fromHash(), false);
+
   if (gl) {
     const FRAG = `
 #ifdef GL_OES_standard_derivatives
@@ -158,73 +226,11 @@ void main(){
     const uRes = U('u_res'), uT = U('u_t'), uM = U('u_m'), uDive = U('u_dive'), uKick = U('u_kick');
     const uC = [U('u_c0'), U('u_c1'), U('u_c2'), U('u_c3')], uK = [U('u_k1'), U('u_k2')];
 
-    /* a tissue = 20 floats: dark rgb, lit rgb, glow rgb, spec rgb, [vein specPow beat stretch], [scale pits cover crawl] */
-    const T: Record<string, number[]> = {
-      altar:          [.02,0,.004,     .24,.012,.022,.42,.05,.06,  .95,.72,.7,   1,32,1,1,     1,0,0,1],      // víscera
-      curse:          [.02,0,.004,     .24,.012,.022,.42,.05,.06,  .95,.72,.7,   1,32,1,1,     1,0,.1,1],     // estómago
-      manifestations: [.03,.04,.005,   .35,.42,.04,  .45,.5,.05,   .95,1,.7,     .3,45,.4,1,   .8,0,.3,1.4],  // bilis
-      clothes:        [.03,.04,.05,    .55,.62,.66,  .25,.3,.34,   .9,.95,1,     .15,60,.2,1,  .7,.3,.3,.3],  // cartílago
-      reveletions:    [.04,.035,.03,   .42,.37,.31,  .16,.13,.1,   .5,.47,.42,   0,8,0,1,      1.4,1,.22,0],  // hueso
-      darkroom:       [.015,0,.003,    .16,0,.015,   .3,.02,.03,   .95,.9,.9,    0,50,.6,1,    1,0,.2,1.5],   // sangre
-      crypt:          [.01,.008,.02,   .08,.06,.1,   .17,.12,.3,   .7,.66,.85,   2.2,40,2.5,2, .8,0,.15,.4],  // nervio
-      industries:     [.08,.06,.02,    .65,.55,.2,   .6,.45,.1,    1,.95,.7,     .2,14,.3,1,   1.6,.8,.5,.2], // grasa
-      colectivo:      [.05,0,.01,      .42,.03,.04,  .5,.08,.06,   .9,.6,.55,    .6,20,1.6,3,  1,0,.2,1.2],   // músculo
-      libro:          [.03,0,.006,     .3,.02,.03,   .45,.06,.07,  .95,.75,.72,  1.2,28,1.1,1, .9,0,.3,1.1],  // entraña
-      bitacora:       [.06,.02,.03,    .5,.22,.26,   .6,.25,.3,    1,.85,.85,    .9,40,.5,1.5, .5,0,.4,.6],   // membrana
-    };
-    const cur = T.altar.slice(); let tgt = T.altar;
     const push = () => {
       for (let i = 0; i < 4; i++) gl.uniform3f(uC[i], cur[i*3], cur[i*3+1], cur[i*3+2]);
       gl.uniform4f(uK[0], cur[12], cur[13], cur[14], cur[15]);
       gl.uniform4f(uK[1], cur[16], cur[17], cur[18], cur[19]);
     };
-
-    /* rooms: the altar is the lobby, every section is a room; a door is a dive, never a scroll */
-    const root = document.documentElement;
-    const marks = Array.from(document.querySelectorAll<HTMLElement>('h2.ordo[id]'));
-    const order = marks.map(h => h.id);
-    const door = (k: string) => document.querySelector<HTMLAnchorElement>(`.doors .${k}`)!;
-    const show = (id: string | null, focus = true) => {
-      if (id) root.dataset.room = id; else delete root.dataset.room;
-      marks.forEach(h => h.classList.toggle('on', h.id === id));
-      const i = id ? order.indexOf(id) : -1;
-      const set = (k: string, to: string | undefined) => {
-        const a = door(k); a.hidden = !to;
-        if (to) { a.href = '#' + to; a.querySelector('span')!.textContent = marks[order.indexOf(to)].querySelector('b')!.textContent; }
-      };
-      set('prev', i > 0 ? order[i - 1] : undefined);
-      set('next', i >= 0 && i < order.length - 1 ? order[i + 1] : undefined);
-      scrollTo(0, 0);
-      tgt = T[id ?? 'altar'] ?? T.altar;
-      const h = id ? marks[i] : playBtn;
-      if (h && focus) { if (h !== playBtn) h.tabIndex = -1; h.focus({ preventScroll: true }); }
-    };
-    let dive = 0, diveTo = 0, pl = 0;
-    const go = (id: string | null, push = true) => {
-      const url = id ? '#' + id : location.pathname;
-      if (still) { show(id); if (push) history.pushState(null, '', url); return; }
-      diveTo = 1;
-      root.style.setProperty('--sy', scrollY + 'px');
-      root.classList.add('dive');
-      setTimeout(() => {
-        /* swap rooms with the page untransformed, then surface from small */
-        root.classList.remove('dive'); root.classList.add('jump'); void root.offsetWidth;
-        show(id); if (push) history.pushState(null, '', url);
-        root.style.setProperty('--sy', '0px');
-        root.classList.replace('jump', 'arrive'); void root.offsetWidth; root.classList.remove('arrive');
-        diveTo = 0;
-      }, 520);
-    };
-    const fromHash = () => { const h = location.hash.slice(1); return order.includes(h) ? h : null; };
-    document.addEventListener('click', e => {
-      const a = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
-      if (!a) return;
-      const id = a.getAttribute('href')!.slice(1);
-      if (id === 'altar' || id === 'top' || id === '') { e.preventDefault(); go(null); }
-      else if (order.includes(id)) { e.preventDefault(); if (id !== root.dataset.room) go(id); }
-    });
-    addEventListener('popstate', () => go(fromHash(), false));
-    show(fromHash(), false);
 
     const size = () => {
       cv.width = Math.max(2, Math.floor(innerWidth / 2));

@@ -558,3 +558,23 @@ html.rooms .ordo.on{scroll-margin-top:0}
 html[data-room] main{padding-top:clamp(1.2rem,4vw,2.2rem)}
 /* el logo y los pips no heredan el hover rojo de los botones genéricos */
 .play:hover,.play:focus-visible,.pips button:hover,.pips button:focus-visible{background:transparent}
+
+/* ── el recorrido: invitación en el altar, voces, pedir, siguiente paso ── */
+.invite{
+  font-family:var(--pixel);font-size:clamp(1.1rem,3.4vw,1.35rem);line-height:1.4;color:var(--ash);margin:.6rem 0 0;
+  position:relative;z-index:1;text-shadow:0 0 4px var(--void),0 0 10px var(--void);
+}
+.invite a{color:var(--blood-lit);text-decoration:none;pointer-events:auto;border:1px solid var(--blood);padding:.25em .55em .15em;margin-left:.4em;white-space:nowrap}
+.invite a:hover,.invite a:focus-visible{background:var(--blood);color:var(--bone)}
+.altar.ep .invite{display:none}
+@media(prefers-reduced-motion:no-preference){.invite a{animation:blink 1.6s steps(1) infinite}}
+.voz{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;color:var(--ash);margin:0 0 1.2rem;border-left:2px solid var(--blood);padding-left:.8em}
+.carta-slot{display:grid;gap:10px;align-content:start}
+.carta-slot .carta{width:100%}
+.pedir{justify-self:stretch;text-align:center}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.rito-meta{flex-wrap:wrap}
+.rito-meta a{color:var(--blood-lit);text-decoration:none}
+.dicho.luego{margin-top:1.8rem}
+.rito-meta a:hover{color:var(--bone)}
+.door.next.step span::before{content:"siguiente: ";color:var(--ash)}

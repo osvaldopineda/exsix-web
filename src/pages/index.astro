@@ -4,6 +4,8 @@ import Carta from '../components/Carta.astro';
 import { curse, PRECIO } from '../data/curse';
 import { ritos } from '../data/rites';
 import { ep } from '../data/ep';
+import { voces } from '../data/voces';
+import { WA, IG, canal, pedir } from '../data/pedidos';
 import '../styles/global.css';
 // el sello es el reproductor: cada pista empieza en un ángulo del anillo interior
 const epTotal = ep.tracks.reduce((s, t) => s + t.dur, 0);
@@ -110,8 +112,9 @@ const archivo = [
               <img class="hero-logo" src="/media/arte/logo-v6.webp" alt="EXSIX" width="900" height="573" />
             </button>
           </h1>
-          <p class="demons" aria-live="polite">exsix demons</p>
+          <p class="demons" aria-live="polite">exsix demons · EP</p>
           <p class="ep-time">0:00 / 0:00</p>
+          <p class="invite"><span>⛧ toca el sello para escuchar</span> <a href="#manifestations">ver el EP ►</a></p>
           <p class="sub">sonido <b>⛧</b> film <b>⛧</b> ropa</p>
         </div>
         <nav aria-label="Realm — índice del sitio">
@@ -142,6 +145,7 @@ const archivo = [
         </div>
         <div class="claw br" aria-hidden="true"></div>
         <div class="bar">⛧ 01 <small>el pergamino</small></div>
+        <p class="voz">⛧ {voces.curse}</p>
         <p class="dicho">Todo lo hacemos <span class="x">nosotros</span>.</p>
         <div class="scroll">
           <p>
@@ -165,8 +169,22 @@ const archivo = [
       <h2 class="ordo" id="manifestations">( <b>manifestations</b> )</h2>
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
-        <div class="bar">⛧ 02 <small>la novedad — cybernet</small></div>
-        <p class="dicho">EXSIX <span class="x">CYBERHELL</span>.</p>
+        <div class="bar">⛧ 02 <small>el EP — exsix demons</small></div>
+        <p class="voz">⛧ {voces.manifestations}</p>
+        <p class="dicho">EXSIX <span class="x">DEMONS</span>.</p>
+        <p class="pista">Un video por pista. Nada de YouTube se carga hasta que aprietas play.</p>
+        <ol class="ritos">
+          {ep.tracks.map((t, i) => (
+            <li class="rito">
+              <button class="rito-go" type="button" data-yt={t.yt} aria-label={`Ver ${t.titulo} del EP ${ep.title}`}>
+                <img src={t.thumb} alt="" width="900" height="506" loading="lazy" decoding="async" />
+                <span class="rito-play" aria-hidden="true"></span>
+              </button>
+              <p class="rito-meta"><b>{t.titulo}</b><a href="#altar" data-track={i}>escuchar en el sello ⛧</a></p>
+            </li>
+          ))}
+        </ol>
+        <p class="dicho luego">la <span class="x">película</span>: EXSIX CYBERHELL.</p>
         <div class="cine">
           <video
             id="teaser"
@@ -208,11 +226,19 @@ const archivo = [
         <div class="flor bl" aria-hidden="true"></div>
         <div class="flor br" aria-hidden="true"></div>
         <div class="bar">⛧ 03 <small>curse n purse</small></div>
-        <p class="dicho">Cada bolso trae su <span class="x">maldición</span>.</p>
+        <p class="voz">⛧ {voces.clothes}</p>
+        <p class="dicho">La ropa de <span class="x">EXSIX DEMONS</span>.</p>
         <p>Bolsos de una sola pieza, cosidos a mano. Cada uno viene con su carta: la entidad que lo habita, lo que exige de ti y lo que pasa si fallas. {PRECIO} cada uno.</p>
-        <p class="pista">Toca una carta para leer la maldición.</p>
+        <p class="pista">Toca una carta para leer la maldición. Pedidos por {canal}.</p>
         <div class="cartas">
-          {curse.map(c => <Carta c={c} />)}
+          {curse.map(c => (
+            <div class="carta-slot">
+              <Carta c={c} />
+              <a class="pedir badge bleed" href={pedir(`⛧ Quiero el bolso ${c.nombre} (${PRECIO}) de CURSE N PURSE`)} target="_blank" rel="noopener">
+                {WA ? `pedir ${c.nombre} · ${PRECIO}` : `pedir ${c.nombre} por instagram`} ↗
+              </a>
+            </div>
+          ))}
         </div>
         <div class="tira">
           {[1,2,3,4,5,6].map(n => (
@@ -241,6 +267,7 @@ const archivo = [
       <h2 class="ordo" id="darkroom">( <b>dark room</b> )</h2>
       <section class="box">
         <div class="bar">⛧ 05 <small>lo que quedó en la cámara</small></div>
+        <p class="voz">⛧ {voces.darkroom}</p>
         <div class="archivo">
           {archivo.map(f => (
             <img src={f.src} alt={f.alt} width="1200" height="900" loading="lazy" decoding="async" />
@@ -273,12 +300,16 @@ const archivo = [
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
         <div class="bar">⛧ 07 <small>ropa personalizada</small></div>
+        <p class="voz">⛧ {voces.industries}</p>
         <p class="dicho">Pide tu propia <span class="x">maldición</span>.</p>
         <p>
           Ropa y bolsos por encargo, cosidos a mano pieza por pieza. Cuéntanos qué
           traes en la cabeza y lo convertimos en algo que puedas vestir.
         </p>
-        <p><a class="badge bleed" href="https://instagram.com/x6.exsix.x6" target="_blank" rel="noopener">escríbenos por instagram ↗</a></p>
+        <p class="cta">
+          {WA && <a class="badge bleed" href={pedir('⛧ Quiero una pieza personalizada de EXSIX INDUSTRIA')} target="_blank" rel="noopener">pide tu maldición por whatsapp ↗</a>}
+          <a class="badge" href={IG} target="_blank" rel="noopener">escríbenos por instagram ↗</a>
+        </p>
       </section>
 
       <!-- EL COLECTIVO -->
@@ -286,6 +317,7 @@ const archivo = [
       <section class="box">
         <div class="claw br" aria-hidden="true"></div>
         <div class="bar">⛧ 08 <small>quienes hicieron esto</small></div>
+        <p class="voz">⛧ {voces.colectivo}</p>
         <div class="six">
           {colectivo.map(m => (
             <div class="member">
